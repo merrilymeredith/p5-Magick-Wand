@@ -8,7 +8,9 @@ use FFI::Platypus;
 my $ffi = FFI::Platypus->new;
 
 # TODO: respect MAGICK_HOME
-$ffi->find_lib(lib => [map {("MagickCore-7.$_", "MagickWand-7.$_")} qw/Q16HDRI Q16 Q8HDRI Q8/]);
+$ffi->find_lib(lib => [map {("MagickCore-$_", "MagickWand-$_")} qw/7.Q16HDRI 7.Q16 7.Q8HDRI 7.Q8 6.Q16HDRI 6.Q16 6.Q8HDRI 6.Q8/]);
+# TODO: Don't actually want multiples, probably need to use CheckLib with a prio list
+
 
 $ffi->type('opaque' => $_) for qw/
   MagickWand

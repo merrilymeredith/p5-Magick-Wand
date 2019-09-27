@@ -2,9 +2,9 @@ version: 2
 jobs:
   build:
     docker:
-      - image: perl:5.28
+      - image: perl:5.30
     steps:
       - checkout
-      - run: sudo apt update && sudo apt install -y --no-install-recommends imagemagick
+      - run: apt update && apt install -y --no-install-recommends imagemagick
       - run: cpanm --installdeps -n .
       - run: prove -lr
