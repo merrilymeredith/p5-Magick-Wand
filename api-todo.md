@@ -7,7 +7,7 @@ https://imagemagick.org/script/magick-wand.php
 ## Needs Follow-up
 
 - [ ] MagickGetException
-  - [ ] Need to release a string returned
+  - [x] Need to release a string returned
   - [ ] we have an autodie thing, it should be smarter about 
       warn/error/fatal
 

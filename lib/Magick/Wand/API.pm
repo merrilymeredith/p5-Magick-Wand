@@ -31,13 +31,26 @@ $ffi->type('int*' => 'ExceptionType_p');
 
 my $exception_check = sub {
   my ($sub, $wand, @args) = @_;
-  $sub->($wand, @args) and return;
+  my $rv = $sub->($wand, @args);
+  return $rv if $rv;
 
   my ($xid, $xstr);
-  $xstr = MagickGetException($wand, \$xid);  # TODO: this returns a string that FFI copies but we still need to release the memory of the returned string.
+  $xstr = MagickGetException($wand, \$xid);
   MagickClearException($wand);
   die "ImageMagick Exception $xid: $xstr"; # TODO: Exception class once we pull moo in?
 };
+
+$ffi->attach(MagickRelinquishMemory => ['opaque'] => 'opaque');
+
+$ffi->custom_type('copied_string' => {
+  native_type    => 'opaque',
+  native_to_perl => sub {
+    my ($ptr) = @_;
+    my $str = $ffi->cast('opaque' => 'string', $ptr);
+    MagickRelinquishMemory($ptr);
+    $str;
+  },
+});
 
 $ffi->attach(@$_)
   for (
@@ -51,11 +64,9 @@ $ffi->attach(@$_)
   [ClearMagickWand   => ['MagickWand'] => 'void'],
   [DestroyMagickWand => ['MagickWand'] => 'MagickWand'],
 
-  [MagickGetException => ['MagickWand', 'ExceptionType_p'] => 'string'],
+  [MagickGetException => ['MagickWand', 'ExceptionType_p'] => 'copied_string'],
   [MagickGetExceptionType => ['MagickWand'] => 'ExceptionType'],
   [MagickClearException => ['MagickWand'] => 'MagickBooleanType'],
-
-  [MagickRelinquishMemory => ['void*'] => 'void*'],
 
   [MagickReadImage => ['MagickWand', 'string'] => 'MagickBooleanType', $exception_check],
   [MagickReadImageBlob => ['MagickWand', 'void*', 'size_t' ] => 'MagickBooleanType', $exception_check],
