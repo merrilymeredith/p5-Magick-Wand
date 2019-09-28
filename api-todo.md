@@ -193,7 +193,7 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickGetImageMask
 - [ ] MagickGetImageBackgroundColor
 - [x] MagickGetImageBlob
-- [ ] MagickGetImagesBlob
+- [x] MagickGetImagesBlob
 - [ ] MagickGetImageBluePrimary
 - [ ] MagickGetImageBorderColor
 - [ ] MagickGetImageFeatures

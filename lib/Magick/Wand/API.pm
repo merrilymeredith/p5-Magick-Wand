@@ -33,17 +33,6 @@ $ffi->type('int' => $_) for qw/
 
 $ffi->type('int*' => 'ExceptionType_p');
 
-my $exception_check = sub {
-  my ($sub, $wand, @args) = @_;
-  my $rv = $sub->($wand, @args);
-  return $rv if $rv;
-
-  my ($xid, $xstr);
-  $xstr = MagickGetException($wand, \$xid);
-  MagickClearException($wand);
-  die "ImageMagick Exception $xid: $xstr"; # TODO: Exception class once we pull moo in?
-};
-
 $ffi->attach(MagickRelinquishMemory => ['opaque'] => 'opaque');
 
 $ffi->custom_type('copied_string' => {
@@ -55,6 +44,26 @@ $ffi->custom_type('copied_string' => {
     $str;
   },
 });
+
+my $exception_check = sub {
+  my ($sub, $wand, @args) = @_;
+  my $rv = $sub->($wand, @args);
+  return $rv if $rv;
+
+  my ($xid, $xstr);
+  $xstr = MagickGetException($wand, \$xid);
+  MagickClearException($wand);
+  die "ImageMagick Exception $xid: $xstr"; # TODO: Exception class once we pull moo in?
+};
+
+# Only useful if the size is last arg... hm
+my $copy_sized_buffer = sub {
+  my ($sub, @args) = @_;
+  my $ptr = $sub->(@args, \(my $size));
+  my $blob = buffer_to_scalar($ptr, $size);
+  MagickRelinquishMemory($ptr);
+  $blob;
+};
 
 $ffi->attach(@$_)
   for (
@@ -78,13 +87,8 @@ $ffi->attach(@$_)
   [MagickWriteImage => ['MagickWand', 'string'] => 'MagickBooleanType', $exception_check],
 
   # my $blob = MagickGetImageBlob($wand); - signature differs because of wrapping
-  [MagickGetImageBlob => ['MagickWand', 'size_t*'] => 'opaque' => sub {
-    my ($sub, $wand) = @_;
-    my $ptr = $sub->($wand, \(my $size));
-    my $blob = buffer_to_scalar($ptr, $size);
-    MagickRelinquishMemory($ptr);
-    $blob;
-  }],
+  [MagickGetImageBlob  => ['MagickWand', 'size_t*'] => 'opaque' => $copy_sized_buffer],
+  [MagickGetImagesBlob => ['MagickWand', 'size_t*'] => 'opaque' => $copy_sized_buffer],
 
   [MagickGetImageWidth => ['MagickWand'] => 'int'],
   [MagickGetImageHeight => ['MagickWand'] => 'int'],
