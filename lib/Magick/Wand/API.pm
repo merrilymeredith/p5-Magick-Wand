@@ -14,6 +14,9 @@ my $ffi = FFI::Platypus->new;
 
 $ffi->lib(locate_libs());
 
+our $MAGICK_VERSION;  # < 0x700
+$ffi->function(GetMagickVersion => ['size_t*'] => 'string')->call(\$MAGICK_VERSION);
+
 $ffi->type('opaque' => $_) for qw/
   MagickWand
   PixelWand
