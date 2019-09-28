@@ -3,14 +3,15 @@ package Magick::Wand::API;
 use warnings;
 use strict;
 
+use File::Spec::Functions qw/catfile/;
+use FFI::CheckLib qw/find_lib/;
 use FFI::Platypus;
+
+use namespace::clean;
 
 my $ffi = FFI::Platypus->new;
 
-# TODO: respect MAGICK_HOME
-$ffi->find_lib(lib => [map {("MagickCore-$_", "MagickWand-$_")} qw/7.Q16HDRI 7.Q16 7.Q8HDRI 7.Q8 6.Q16HDRI 6.Q16 6.Q8HDRI 6.Q8/]);
-# TODO: Don't actually want multiples, probably need to use CheckLib with a prio list
-
+$ffi->lib(locate_libs());
 
 $ffi->type('opaque' => $_) for qw/
   MagickWand
@@ -66,9 +67,47 @@ $ffi->attach(@$_)
 
   );
 
+#TODO:
+# - is this type of search slow?
+# - Wonder if i could dump every permutation in then pick the first two.
+# - Someone may want to force a specific suffix.
+sub locate_libs {
+  my @priority =
+    qw/7.Q16HDRI 7.Q16 7.Q8HDRI 7.Q8 6.Q16HDRI 6.Q16 6.Q8HDRI 6.Q8/;
+
+  my @findopts = !$ENV{MAGICK_HOME} ? () : (
+    systempath => [],
+    libpath    => $ENV{MAGICK_HOME},
+  );
+
+  if ($^O eq 'MSWin32') {
+    return find_lib(
+      lib => ['CORE_RL_magick_', 'CORE_RL_wand_'],
+      @findopts,
+    );
+  }
+  else {
+    for my $suffix (@priority) {
+      my @libs = find_lib(
+        lib => ["MagickCore-$suffix", "MagickWand-$suffix"],
+        @findopts,
+      );
+
+      return @libs if @libs;
+    }
+  }
+
+  die "No suitable MagickWand library found";
+}
+
 # Do this on first -new?
 MagickWandGenesis() unless IsMagickWandInstantiated();
 
-END { MagickWandTerminus() if IsMagickWandInstantiated(); };
+END {
+  # We play it careful so we don't make noise if no library was loaded at all.
+  if (my $f = __PACKAGE__->can('IsMagickWandInstantiated')) {
+    MagickWandTerminus() if $f->();
+  }
+};
 
 1;
