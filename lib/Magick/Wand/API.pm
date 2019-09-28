@@ -19,11 +19,12 @@ $ffi->type('opaque' => $_) for qw/
   /;
 
 $ffi->type('int' => $_) for qw/
-  MagickBooleanType
   CompositeOperator
+  ExceptionType
   GravityType
-  OrientationType
   InterlaceType
+  MagickBooleanType
+  OrientationType
   /;
 
 $ffi->type('int*' => 'ExceptionType_p');
@@ -33,7 +34,8 @@ my $exception_check = sub {
   $sub->($wand, @args) and return;
 
   my ($xid, $xstr);
-  $xstr = MagickGetException($wand, \$xid);
+  $xstr = MagickGetException($wand, \$xid);  # TODO: this returns a string that FFI copies but we still need to release the memory of the returned string.
+  MagickClearException($wand);
   die "ImageMagick Exception $xid: $xstr"; # TODO: Exception class once we pull moo in?
 };
 
@@ -44,8 +46,14 @@ $ffi->attach(@$_)
   [MagickWandTerminus       => [] => 'void'],
 
   [NewMagickWand     => []             => 'MagickWand'],
+  [IsMagickWand      => ['MagickWand'] => 'MagickBooleanType'],
   [CloneMagickWand   => ['MagickWand'] => 'MagickWand'],
+  [ClearMagickWand   => ['MagickWand'] => 'void'],
   [DestroyMagickWand => ['MagickWand'] => 'MagickWand'],
+
+  [MagickGetException => ['MagickWand', 'ExceptionType_p'] => 'string'],
+  [MagickGetExceptionType => ['MagickWand'] => 'ExceptionType'],
+  [MagickClearException => ['MagickWand'] => 'MagickBooleanType'],
 
   [MagickRelinquishMemory => ['void*'] => 'void*'],
 
@@ -54,8 +62,6 @@ $ffi->attach(@$_)
 
   [MagickWriteImage => ['MagickWand', 'string'] => 'MagickBooleanType', $exception_check],
   [MagickGetImageBlob => ['MagickWand', 'size_t*'] => 'string'], # TODO: Probably need to cast opaque-string then free?
-
-  [MagickGetException => ['MagickWand', 'ExceptionType_p'] => 'string'],
 
   [MagickGetImageWidth => ['MagickWand'] => 'int'],
   [MagickGetImageHeight => ['MagickWand'] => 'int'],
