@@ -6,6 +6,7 @@ use strict;
 use File::Spec::Functions qw/catfile/;
 use FFI::CheckLib qw/find_lib/;
 use FFI::Platypus;
+use FFI::Platypus::Buffer qw/buffer_to_scalar/;
 
 use namespace::clean;
 
@@ -69,10 +70,18 @@ $ffi->attach(@$_)
   [MagickClearException => ['MagickWand'] => 'MagickBooleanType'],
 
   [MagickReadImage => ['MagickWand', 'string'] => 'MagickBooleanType', $exception_check],
-  [MagickReadImageBlob => ['MagickWand', 'void*', 'size_t' ] => 'MagickBooleanType', $exception_check],
+  [MagickReadImageBlob => ['MagickWand', 'string', 'size_t' ] => 'MagickBooleanType', $exception_check],
 
   [MagickWriteImage => ['MagickWand', 'string'] => 'MagickBooleanType', $exception_check],
-  [MagickGetImageBlob => ['MagickWand', 'size_t*'] => 'string'], # TODO: Probably need to cast opaque-string then free?
+
+  # my $blob = MagickGetImageBlob($wand); - signature differs because of wrapping
+  [MagickGetImageBlob => ['MagickWand', 'size_t*'] => 'opaque' => sub {
+    my ($sub, $wand) = @_;
+    my $ptr = $sub->($wand, \(my $size));
+    my $blob = buffer_to_scalar($ptr, $size);
+    MagickRelinquishMemory($ptr);
+    $blob;
+  }],
 
   [MagickGetImageWidth => ['MagickWand'] => 'int'],
   [MagickGetImageHeight => ['MagickWand'] => 'int'],
