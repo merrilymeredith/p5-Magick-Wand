@@ -17,8 +17,13 @@ $ffi->lib(locate_libs());
 our $MAGICK_VERSION;  # < 0x700
 $ffi->function(GetMagickVersion => ['size_t*'] => 'string')->call(\$MAGICK_VERSION);
 
+$ffi->custom_type('MagickWand' => {
+  native_type => 'opaque',
+  native_to_perl => sub { bless \$_[0], 'Magick::Wand' },
+  perl_to_native => sub { ${$_[0]} },
+});
+
 $ffi->type('opaque' => $_) for qw/
-  MagickWand
   Image
   PixelWand
   /;
@@ -34,8 +39,6 @@ $ffi->type('int' => $_) for qw/
 
 $ffi->type('int*' => 'ExceptionType_p');
 
-$ffi->attach(MagickRelinquishMemory => ['opaque'] => 'opaque');
-
 $ffi->custom_type('copied_string' => {
   native_type    => 'opaque',
   native_to_perl => sub {
@@ -45,17 +48,6 @@ $ffi->custom_type('copied_string' => {
     $str;
   },
 });
-
-my $exception_check = sub {
-  my ($sub, $wand, @args) = @_;
-  my $rv = $sub->($wand, @args);
-  return $rv if $rv;
-
-  my ($xid, $xstr);
-  $xstr = MagickGetException($wand, \$xid);
-  MagickClearException($wand);
-  die "ImageMagick Exception $xid: $xstr"; # TODO: Exception class once we pull moo in?
-};
 
 # Only useful if the size is last arg... hm
 my $copy_sized_buffer = sub {
@@ -68,48 +60,76 @@ my $copy_sized_buffer = sub {
 
 $ffi->attach(@$_)
   for (
+  [MagickRelinquishMemory => ['opaque'] => 'opaque'],
   [MagickWandGenesis        => [] => 'void'],
   [IsMagickWandInstantiated => [] => 'MagickBooleanType'],
   [MagickWandTerminus       => [] => 'void'],
-
-  [NewMagickWand     => []             => 'MagickWand'],
-  [IsMagickWand      => ['MagickWand'] => 'MagickBooleanType'],
-  [CloneMagickWand   => ['MagickWand'] => 'MagickWand'],
-  [ClearMagickWand   => ['MagickWand'] => 'void'],
-  [DestroyMagickWand => ['MagickWand'] => 'MagickWand'],
-
-  # I'm not sure there's a use for these if you stay in MagickWand land
-  [NewMagickWandFromImage => ['Image'] => 'MagickWand'],
-  [GetImageFromMagickWand => ['MagickWand'] => 'Image'],
-
-  [MagickGetException => ['MagickWand', 'ExceptionType_p'] => 'copied_string'],
-  [MagickGetExceptionType => ['MagickWand'] => 'ExceptionType'],
-  [MagickClearException => ['MagickWand'] => 'MagickBooleanType'],
-
-  [MagickReadImage => ['MagickWand', 'string'] => 'MagickBooleanType', $exception_check],
-  [MagickReadImageBlob => ['MagickWand', 'string', 'size_t'] => 'MagickBooleanType', $exception_check],
-
-  [MagickGetIteratorIndex => ['MagickWand'] => 'ssize_t'],
-  [MagickSetIteratorIndex => ['MagickWand', 'ssize_t'] => 'MagickBooleanType', $exception_check],
-  [MagickSetFirstIterator => ['MagickWand'] => 'void'],
-  [MagickSetLastIterator => ['MagickWand'] => 'void'],
-  [MagickResetIterator => ['MagickWand'] => 'void'],
-
-  [MagickWriteImage => ['MagickWand', 'string'] => 'MagickBooleanType', $exception_check],
-
-  # my $blob = MagickGetImageBlob($wand); - signature differs because of wrapping
-  [MagickGetImageBlob  => ['MagickWand', 'size_t*'] => 'opaque' => $copy_sized_buffer],
-  [MagickGetImagesBlob => ['MagickWand', 'size_t*'] => 'opaque' => $copy_sized_buffer],
-
-  [MagickGetImageWidth => ['MagickWand'] => 'int'],
-  [MagickGetImageHeight => ['MagickWand'] => 'int'],
-
-  [MagickAddImage => ['MagickWand', 'MagickWand'] => 'MagickBooleanType', $exception_check],
-
-  [MagickGetImageFormat => ['MagickWand'] => 'string'],
-  [MagickSetImageFormat => ['MagickWand', 'string'] => 'MagickBooleanType', $exception_check],
-
   );
+
+package Magick::Wand {
+  sub methodize {
+   join '_', map {lc} grep {length} split /([A-Z][^A-Z]*)/, ($_[0] =~ s/^Magick//r)
+  }
+
+  sub exception_check {
+    my ($sub, $wand, @args) = @_;
+    my $rv = $sub->($wand, @args);
+    return $rv if $rv;
+
+    my ($xid, $xstr);
+    $xstr = $wand->get_exception(\$xid);
+    $wand->clear_exception;
+    die "ImageMagick Exception $xid: $xstr"; # TODO: Exception class?
+  };
+
+  use namespace::clean;
+
+  $ffi->attach(@$_)
+    for (
+    [[NewMagickWand => 'new'] => [] => 'MagickWand'],
+
+    [IsMagickWand                     => ['MagickWand'] => 'MagickBooleanType'],
+    [[CloneMagickWand => 'clone']     => ['MagickWand'] => 'MagickWand'],
+    [[ClearMagickWand => 'clear']     => ['MagickWand'] => 'void'],
+    [[DestroyMagickWand => 'DESTROY'] => ['MagickWand'] => 'void'],
+
+    # I'm not sure there's a use for these if you stay in MagickWand land
+    [NewMagickWandFromImage => ['Image'] => 'MagickWand'],
+    [GetImageFromMagickWand => ['MagickWand'] => 'Image'],
+    );
+
+  # All of the below are attached as snake_case without 'magick_'
+  # MagickReadImage => read_image
+  $ffi->attach(@$_)
+    for map {$$_[0] = [$$_[0] => methodize($$_[0])]; $_} (
+    [MagickGetException     => ['MagickWand', 'ExceptionType_p'] => 'copied_string'],
+    [MagickGetExceptionType => ['MagickWand'] => 'ExceptionType'],
+    [MagickClearException   => ['MagickWand'] => 'MagickBooleanType'],
+
+    [MagickReadImage => ['MagickWand', 'string'] => 'MagickBooleanType', \&exception_check],
+    [MagickReadImageBlob => ['MagickWand', 'string', 'size_t'] => 'MagickBooleanType', \&exception_check],
+
+    [MagickGetIteratorIndex => ['MagickWand'] => 'ssize_t'],
+    [MagickSetIteratorIndex => ['MagickWand', 'ssize_t'] => 'MagickBooleanType', \&exception_check],
+    [MagickSetFirstIterator => ['MagickWand'] => 'void'],
+    [MagickSetLastIterator => ['MagickWand'] => 'void'],
+    [MagickResetIterator => ['MagickWand'] => 'void'],
+
+    [MagickWriteImage => ['MagickWand', 'string'] => 'MagickBooleanType', \&exception_check],
+
+    # my $blob = MagickGetImageBlob($wand); - signature differs because of wrapping
+    [MagickGetImageBlob  => ['MagickWand', 'size_t*'] => 'opaque' => $copy_sized_buffer],
+    [MagickGetImagesBlob => ['MagickWand', 'size_t*'] => 'opaque' => $copy_sized_buffer],
+
+    [MagickGetImageWidth => ['MagickWand'] => 'int'],
+    [MagickGetImageHeight => ['MagickWand'] => 'int'],
+
+    [MagickAddImage => ['MagickWand', 'MagickWand'] => 'MagickBooleanType', \&exception_check],
+
+    [MagickGetImageFormat => ['MagickWand'] => 'string'],
+    [MagickSetImageFormat => ['MagickWand', 'string'] => 'MagickBooleanType', \&exception_check],
+    );
+}
 
 #TODO:
 # - is this type of search slow?
