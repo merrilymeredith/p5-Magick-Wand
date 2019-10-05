@@ -35,7 +35,7 @@ https://imagemagick.org/script/magick-wand.php
 - [x] MagickWandGenesis
 - [x] MagickWandTerminus
 - [x] NewMagickWand
-- [ ] NewMagickWandFromImage
+- [x] NewMagickWandFromImage
 - [x] IsMagickWandInstantiated
 
 ## magick-property
@@ -114,7 +114,7 @@ https://imagemagick.org/script/magick-wand.php
 
 ## magick-image
 
-- [ ] GetImageFromMagickWand
+- [x] GetImageFromMagickWand
 - [ ] MagickAdaptiveBlurImage
 - [ ] MagickAdaptiveResizeImage
 - [ ] MagickAdaptiveSharpenImage

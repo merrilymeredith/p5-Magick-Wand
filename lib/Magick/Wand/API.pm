@@ -19,6 +19,7 @@ $ffi->function(GetMagickVersion => ['size_t*'] => 'string')->call(\$MAGICK_VERSI
 
 $ffi->type('opaque' => $_) for qw/
   MagickWand
+  Image
   PixelWand
   /;
 
@@ -76,6 +77,10 @@ $ffi->attach(@$_)
   [CloneMagickWand   => ['MagickWand'] => 'MagickWand'],
   [ClearMagickWand   => ['MagickWand'] => 'void'],
   [DestroyMagickWand => ['MagickWand'] => 'MagickWand'],
+
+  # I'm not sure there's a use for these if you stay in MagickWand land
+  [NewMagickWandFromImage => ['Image'] => 'MagickWand'],
+  [GetImageFromMagickWand => ['MagickWand'] => 'Image'],
 
   [MagickGetException => ['MagickWand', 'ExceptionType_p'] => 'copied_string'],
   [MagickGetExceptionType => ['MagickWand'] => 'ExceptionType'],
