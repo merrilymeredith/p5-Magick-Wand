@@ -4,7 +4,6 @@ use warnings;
 use strict;
 
 use Magick::Wand::API;
-use Magick::Wand::Constants ':all';
 
 1;
 __END__

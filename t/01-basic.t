@@ -4,6 +4,7 @@ use File::Temp;
 use File::Spec::Functions qw/catfile/;
 
 use Magick::Wand;
+use Magick::Wand::Constants;
 
 ok my $w = Magick::Wand->new,
   'new wand';
