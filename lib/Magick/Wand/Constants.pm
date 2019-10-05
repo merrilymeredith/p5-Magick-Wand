@@ -20,6 +20,50 @@ BEGIN {
       MagickTrue
     /},
 
+    ImageType => {enum qw/
+      UndefinedType
+      BilevelType
+      GrayscaleType
+      GrayscaleMatteType
+      PaletteType
+      PaletteMatteType
+      TrueColorType
+      TrueColorMatteType
+      ColorSeparationType
+      ColorSeparationMatteType
+      OptimizeType
+      PaletteBilevelMatteType
+    /},
+
+    InterlaceType => {enum qw/
+      UndefinedInterlace
+      NoInterlace
+      LineInterlace
+      PlaneInterlace
+      PartitionInterlace
+      GIFInterlace
+      JPEGInterlace
+      PNGInterlace
+    /},
+
+    OrientationType => {enum qw/
+      UndefinedOrientation
+      TopLeftOrientation
+      TopRightOrientation
+      BottomRightOrientation
+      BottomLeftOrientation
+      LeftTopOrientation
+      RightTopOrientation
+      RightBottomOrientation
+      LeftBottomOrientation
+    /},
+
+    ResolutionType => {enum qw/
+      UndefinedResolution
+      PixelsPerInchResolution
+      PixelsPerCentimeterResolution
+    /},
+
     NoiseType => {enum qw/
       UndefinedNoise
       UniformNoise
