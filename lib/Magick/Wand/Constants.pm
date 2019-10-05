@@ -15,8 +15,6 @@ use namespace::clean;
 our %const;
 
 BEGIN {
-  my $VERSION = $Magick::Wand::API::MAGICK_VERSION;
-
   %const = (
     MagickBooleanType => {enum qw/
       MagickFalse
@@ -154,7 +152,7 @@ BEGIN {
     /},
   );
 
-  if ($VERSION >= 0x700) {
+  if ($Magick::Wand::API::MAGICK_VERSION >= 0x700) {
     $const{AlphaChannelOption} = {enum qw/
       UndefinedAlphaChannel
       ActivateAlphaChannel
