@@ -5,11 +5,15 @@ use strict;
 
 use parent 'Exporter';
 
+use Magick::Wand::API;
+
 sub enum { my $i = 0; map {$_ => $i++} @_ }
 
 our %const;
 
 BEGIN {
+  my $VERSION = $Magick::Wand::API::MAGICK_VERSION;
+
   %const = (
     MagickBooleanType => {enum qw/
       MagickFalse
@@ -102,6 +106,46 @@ BEGIN {
       StereoCompositeOp
     /},
   );
+
+  if ($VERSION >= 0x700) {
+    $const{AlphaChannelOption} = {enum qw/
+      UndefinedAlphaChannel
+      ActivateAlphaChannel
+      AssociateAlphaChannel
+      BackgroundAlphaChannel
+      CopyAlphaChannel
+      DeactivateAlphaChannel
+      DiscreteAlphaChannel
+      DisassociateAlphaChannel
+      ExtractAlphaChannel
+      OffAlphaChannel
+      OnAlphaChannel
+      OpaqueAlphaChannel
+      RemoveAlphaChannel
+      SetAlphaChannel
+      ShapeAlphaChannel
+      TransparentAlphaChannel
+    /};
+  }
+  else {
+    $const{AlphaChannelOption} = {enum qw/
+      UndefinedAlphaChannel
+      ActivateAlphaChannel
+      BackgroundAlphaChannel
+      CopyAlphaChannel
+      DeactivateAlphaChannel
+      ExtractAlphaChannel
+      OpaqueAlphaChannel
+      ResetAlphaChannel
+      SetAlphaChannel
+      ShapeAlphaChannel
+      TransparentAlphaChannel
+      FlattenAlphaChannel
+      RemoveAlphaChannel
+      AssociateAlphaChannel
+      DisassociateAlphaChannel
+    /};
+  }
 }
 
 use constant {
