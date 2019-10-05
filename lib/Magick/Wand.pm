@@ -42,18 +42,20 @@ a C compiler, nor is it bundled into the ImageMagick source distribution and
 tied to specific versions of ImageMagick - all troublesome when working on
 Windows.
 
-=head1 IMAGE STACK
+=head1 BEHAVIOR
+
+=head2 Image Stack
 
 Each Wand holds one or more images, and has an "iterator", which is like the
 currently selected image in the stack.  Many operations work on the currently
 selected image, or insert new images at the current selection.  There is
 a group of methods dealing with this:
 
-L</next_image>, L</previous_image>, L</get_iterator_index>,
-L</set_iterator_index>, L</set_first_iterator>, L</set_last_iterator>,
-L</reset_iterator>
+L</next_image>, L</previous_image>, L</get_number_images>,
+L</get_iterator_index>, L</set_iterator_index>, L</set_first_iterator>,
+L</set_last_iterator>, L</reset_iterator>
 
-=head1 ERRORS
+=head2 Errors
 
 Magick::Wand throws exceptions on error.  MagickWand has the concept of
 a warning, and I still need to sort out how that is handled.
@@ -105,13 +107,13 @@ The same as L</read_image>, but for data already in memory.
 
   my ($xstr, $xid) = $wand->get_exception;
 
-Returns current exception string and exception id, if any. (See L</ERRORS>)
+Returns current exception string and exception id, if any. (See L</Errors>)
 
 =head2 get_exception_id
 
   my $xid = $wand->get_exception_id;
 
-Returns current exception id, if any. (See L</ERRORS>)
+Returns current exception id, if any. (See L</Errors>)
 
 =head2 clear_exception
 

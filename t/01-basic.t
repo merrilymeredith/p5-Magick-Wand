@@ -17,6 +17,8 @@ ok dies {
   $w->read_image("junk_path_$$.png")
 }, 'autodies work';
 
+ok dies { $w->next_image }, 'next_image is an exception when empty';
+
 my $scratch = File::Temp->newdir;
 
 ok $w->read_image('logo:'), 'got logo';

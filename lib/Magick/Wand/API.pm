@@ -79,6 +79,8 @@ package Magick::Wand {
     return $rv if $rv;
 
     my ($xid, $xstr) = $wand->get_exception;
+    return $rv unless $xid;  # no exception, just a falsey result
+
     $wand->clear_exception;
     die "ImageMagick Exception $xid: $xstr"; # TODO: Exception class?
   };
@@ -118,6 +120,9 @@ package Magick::Wand {
       exception_check(@_, length $_[-1]);
     }],
 
+    [MagickNextImage => ['MagickWand'] => 'MagickBooleanType' => \&exception_check],
+    [MagickPreviousImage => ['MagickWand'] => 'MagickBooleanType' => \&exception_check],
+    [MagickGetNumberImages => ['MagickWand'] => 'size_t'],
     [MagickGetIteratorIndex => ['MagickWand'] => 'ssize_t'],
     [MagickSetIteratorIndex => ['MagickWand', 'ssize_t'] => 'MagickBooleanType', \&exception_check],
     [MagickSetFirstIterator => ['MagickWand'] => 'void'],
