@@ -6,8 +6,11 @@ use strict;
 use parent 'Exporter';
 
 use Magick::Wand::API;
+use Hash::Util qw/lock_hash_recurse/;
 
 sub enum { my $i = 0; map {$_ => $i++} @_ }
+
+use namespace::clean;
 
 our %const;
 
@@ -190,7 +193,10 @@ BEGIN {
       DisassociateAlphaChannel
     /};
   }
+
+  lock_hash_recurse %const;
 }
+
 
 use constant {
   %const,
