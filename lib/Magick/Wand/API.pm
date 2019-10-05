@@ -85,16 +85,17 @@ package Magick::Wand {
 
   $ffi->attach(@$_)
     for (
-    [[NewMagickWand => 'new'] => [] => 'MagickWand'],
+    [[NewMagickWand => 'new']            => [] => 'MagickWand'],
+    [[IsMagickWand  => 'is_magick_wand'] => ['MagickWand'] => 'MagickBooleanType'],
 
-    [IsMagickWand                     => ['MagickWand'] => 'MagickBooleanType'],
     [[CloneMagickWand => 'clone']     => ['MagickWand'] => 'MagickWand'],
     [[ClearMagickWand => 'clear']     => ['MagickWand'] => 'void'],
     [[DestroyMagickWand => 'DESTROY'] => ['MagickWand'] => 'void'],
 
-    # I'm not sure there's a use for these if you stay in MagickWand land
-    [NewMagickWandFromImage => ['Image'] => 'MagickWand'],
-    [GetImageFromMagickWand => ['MagickWand'] => 'Image'],
+    # I'm not sure there's a use for these if you stay in MagickWand land?
+    # [NewMagickWandFromImage => ['Image'] => 'MagickWand'],
+    # [GetImageFromMagickWand => ['MagickWand'] => 'Image'],
+    # [MagickDestroyImage     => ['Image'] => 'void'],
     );
 
   # All of the below are attached as snake_case without 'magick_'
@@ -120,6 +121,8 @@ package Magick::Wand {
     [MagickSetFirstIterator => ['MagickWand'] => 'void'],
     [MagickSetLastIterator => ['MagickWand'] => 'void'],
     [MagickResetIterator => ['MagickWand'] => 'void'],
+
+    [MagickGetImage => ['MagickWand'] => 'MagickWand'],
 
     [MagickWriteImage => ['MagickWand', 'string'] => 'MagickBooleanType', \&exception_check],
 

@@ -35,7 +35,7 @@ https://imagemagick.org/script/magick-wand.php
 - [x] MagickWandGenesis
 - [x] MagickWandTerminus
 - [x] NewMagickWand
-- [x] NewMagickWandFromImage
+- [-] NewMagickWandFromImage
 - [x] IsMagickWandInstantiated
 
 ## magick-property
@@ -114,7 +114,7 @@ https://imagemagick.org/script/magick-wand.php
 
 ## magick-image
 
-- [x] GetImageFromMagickWand
+- [-] GetImageFromMagickWand
 - [ ] MagickAdaptiveBlurImage
 - [ ] MagickAdaptiveResizeImage
 - [ ] MagickAdaptiveSharpenImage
@@ -166,7 +166,7 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickDeconstructImages
 - [ ] MagickDeskewImage
 - [ ] MagickDespeckleImage
-- [ ] MagickDestroyImage
+- [-] MagickDestroyImage
 - [ ] MagickDisplayImage
 - [ ] MagickDisplayImages
 - [ ] MagickDistortImage
@@ -188,7 +188,7 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickFxImage
 - [ ] MagickGammaImage
 - [ ] MagickGaussianBlurImage
-- [ ] MagickGetImage
+- [x] MagickGetImage
 - [ ] MagickGetImageAlphaChannel
 - [ ] MagickGetImageMask
 - [ ] MagickGetImageBackgroundColor
