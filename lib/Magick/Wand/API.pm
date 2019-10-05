@@ -76,8 +76,7 @@ package Magick::Wand {
     my $rv = $sub->($wand, @args);
     return $rv if $rv;
 
-    my ($xid, $xstr);
-    $xstr = $wand->get_exception(\$xid);
+    my ($xid, $xstr) = $wand->get_exception;
     $wand->clear_exception;
     die "ImageMagick Exception $xid: $xstr"; # TODO: Exception class?
   };
@@ -100,14 +99,21 @@ package Magick::Wand {
 
   # All of the below are attached as snake_case without 'magick_'
   # MagickReadImage => read_image
+  # Let's also try to wrap to hide "outbound args" and things that are weird to perl
   $ffi->attach(@$_)
     for map {$$_[0] = [$$_[0] => methodize($$_[0])]; $_} (
-    [MagickGetException     => ['MagickWand', 'ExceptionType_p'] => 'copied_string'],
+    [MagickGetException     => ['MagickWand', 'ExceptionType_p'] => 'copied_string' => sub {
+      my ($sub, $wand) = @_;
+      my $xstr = $sub->($wand, \(my $xid));
+      $xid, $xstr;
+    }],
     [MagickGetExceptionType => ['MagickWand'] => 'ExceptionType'],
     [MagickClearException   => ['MagickWand'] => 'MagickBooleanType'],
 
     [MagickReadImage => ['MagickWand', 'string'] => 'MagickBooleanType', \&exception_check],
-    [MagickReadImageBlob => ['MagickWand', 'string', 'size_t'] => 'MagickBooleanType', \&exception_check],
+    [MagickReadImageBlob => ['MagickWand', 'string', 'size_t'] => 'MagickBooleanType' => sub {
+      exception_check(@_, length $_[-1]);
+    }],
 
     [MagickGetIteratorIndex => ['MagickWand'] => 'ssize_t'],
     [MagickSetIteratorIndex => ['MagickWand', 'ssize_t'] => 'MagickBooleanType', \&exception_check],
