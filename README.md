@@ -33,18 +33,20 @@ a C compiler, nor is it bundled into the ImageMagick source distribution and
 tied to specific versions of ImageMagick - all troublesome when working on
 Windows.
 
-# IMAGE STACK
+# BEHAVIOR
+
+## Image Stack
 
 Each Wand holds one or more images, and has an "iterator", which is like the
 currently selected image in the stack.  Many operations work on the currently
 selected image, or insert new images at the current selection.  There is
 a group of methods dealing with this:
 
-["next\_image"](#next_image), ["previous\_image"](#previous_image), ["get\_iterator\_index"](#get_iterator_index),
-["set\_iterator\_index"](#set_iterator_index), ["set\_first\_iterator"](#set_first_iterator), ["set\_last\_iterator"](#set_last_iterator),
-["reset\_iterator"](#reset_iterator)
+["next\_image"](#next_image), ["previous\_image"](#previous_image), ["get\_number\_images"](#get_number_images),
+["get\_iterator\_index"](#get_iterator_index), ["set\_iterator\_index"](#set_iterator_index), ["set\_first\_iterator"](#set_first_iterator),
+["set\_last\_iterator"](#set_last_iterator), ["reset\_iterator"](#reset_iterator)
 
-# ERRORS
+## Errors
 
 Magick::Wand throws exceptions on error.  MagickWand has the concept of
 a warning, and I still need to sort out how that is handled.
@@ -96,13 +98,13 @@ The same as ["read\_image"](#read_image), but for data already in memory.
 
     my ($xstr, $xid) = $wand->get_exception;
 
-Returns current exception string and exception id, if any. (See ["ERRORS"](#errors))
+Returns current exception string and exception id, if any. (See ["Errors"](#errors))
 
 ## get\_exception\_id
 
     my $xid = $wand->get_exception_id;
 
-Returns current exception id, if any. (See ["ERRORS"](#errors))
+Returns current exception id, if any. (See ["Errors"](#errors))
 
 ## clear\_exception
 
