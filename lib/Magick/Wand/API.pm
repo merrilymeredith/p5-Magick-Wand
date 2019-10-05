@@ -35,6 +35,7 @@ $ffi->type('int' => $_) for qw/
   InterlaceType
   MagickBooleanType
   OrientationType
+  NoiseType
   /;
 
 $ffi->type('int*' => 'ExceptionType_p');
@@ -134,6 +135,7 @@ package Magick::Wand {
     [MagickGetImageHeight => ['MagickWand'] => 'int'],
 
     [MagickAddImage => ['MagickWand', 'MagickWand'] => 'MagickBooleanType', \&exception_check],
+    [MagickAddNoiseImage => ['MagickWand', 'NoiseType', 'double'] => 'MagickBooleanType', \&exception_check],
 
     [MagickGetImageFormat => ['MagickWand'] => 'string'],
     [MagickSetImageFormat => ['MagickWand', 'string'] => 'MagickBooleanType', \&exception_check],

@@ -120,7 +120,7 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickAdaptiveSharpenImage
 - [ ] MagickAdaptiveThresholdImage
 - [x] MagickAddImage
-- [ ] MagickAddNoiseImage
+- [x] MagickAddNoiseImage
 - [ ] MagickAffineTransformImage
 - [ ] MagickAnnotateImage
 - [ ] MagickAnimateImages
