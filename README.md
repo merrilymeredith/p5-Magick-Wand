@@ -12,14 +12,14 @@ Not on CPAN yet and the interface should not be considered stable.
 
 # SYNOPSIS
 
-use Magick::Wand;
+    use Magick::Wand;
 
-for my $file (glob '\*.jpg') {
-  my $w = Magick::Wand->new;
-  $w->read\_image($file);
-  $w->auto\_orient\_image;
-  $w->write\_image($file);
-}
+    for my $file (glob '*.jpg') {
+      my $w = Magick::Wand->new;
+      $w->read_image($file);
+      $w->auto_orient_image;
+      $w->write_image($file);
+    }
 
 # DESCRIPTION
 

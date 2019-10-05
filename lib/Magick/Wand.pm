@@ -22,14 +22,14 @@ Not on CPAN yet and the interface should not be considered stable.
 
 =head1 SYNOPSIS
 
-use Magick::Wand;
+  use Magick::Wand;
 
-for my $file (glob '*.jpg') {
-  my $w = Magick::Wand->new;
-  $w->read_image($file);
-  $w->auto_orient_image;
-  $w->write_image($file);
-}
+  for my $file (glob '*.jpg') {
+    my $w = Magick::Wand->new;
+    $w->read_image($file);
+    $w->auto_orient_image;
+    $w->write_image($file);
+  }
 
 =head1 DESCRIPTION
 
