@@ -82,7 +82,13 @@ $ffi->attach(@$_)
   [MagickClearException => ['MagickWand'] => 'MagickBooleanType'],
 
   [MagickReadImage => ['MagickWand', 'string'] => 'MagickBooleanType', $exception_check],
-  [MagickReadImageBlob => ['MagickWand', 'string', 'size_t' ] => 'MagickBooleanType', $exception_check],
+  [MagickReadImageBlob => ['MagickWand', 'string', 'size_t'] => 'MagickBooleanType', $exception_check],
+
+  [MagickGetIteratorIndex => ['MagickWand'] => 'ssize_t'],
+  [MagickSetIteratorIndex => ['MagickWand', 'ssize_t'] => 'MagickBooleanType', $exception_check],
+  [MagickSetFirstIterator => ['MagickWand'] => 'void'],
+  [MagickSetLastIterator => ['MagickWand'] => 'void'],
+  [MagickResetIterator => ['MagickWand'] => 'void'],
 
   [MagickWriteImage => ['MagickWand', 'string'] => 'MagickBooleanType', $exception_check],
 

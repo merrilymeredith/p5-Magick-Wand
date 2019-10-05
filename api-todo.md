@@ -28,10 +28,10 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickQueryFonts
 - [ ] MagickQueryFormats
 - [x] MagickRelinquishMemory
-- [ ] MagickResetIterator
-- [ ] MagickSetFirstIterator
-- [ ] MagickSetIteratorIndex
-- [ ] MagickSetLastIterator
+- [x] MagickResetIterator
+- [x] MagickSetFirstIterator
+- [x] MagickSetIteratorIndex
+- [x] MagickSetLastIterator
 - [x] MagickWandGenesis
 - [x] MagickWandTerminus
 - [x] NewMagickWand
