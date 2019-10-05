@@ -200,12 +200,12 @@ BEGIN {
 
 use constant {
   %const,
-  map {%$_} grep {(ref($_) // '') eq 'HASH'} values %const,
+  map {%$_} grep {ref($_) eq 'HASH'} values %const,
 };
 
 our @EXPORT_OK = (
   keys %const,
-  map {keys %$_} grep {(ref($_) // '') eq 'HASH'} values %const,
+  map {keys %$_} grep {ref($_) eq 'HASH'} values %const,
 );
 
 1;
