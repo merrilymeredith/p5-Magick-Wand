@@ -69,7 +69,8 @@ $ffi->attach(@$_)
 
 package Magick::Wand {
   sub methodize {
-   join '_', map {lc} grep {length} split /([A-Z][^A-Z]*)/, ($_[0] =~ s/^Magick//r)
+   my $name = $_[0]; $name =~ s/^Magick//;
+   join '_', map {lc} grep {length} split /([A-Z][^A-Z]*)/, $name;
   }
 
   sub exception_check {
