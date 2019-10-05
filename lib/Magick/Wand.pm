@@ -5,6 +5,14 @@ use strict;
 
 use Magick::Wand::API;
 
+## The meat of this class is created in Magick::Wand::API! ##
+
+sub tap {
+  my ($self, $method, @args) = @_;
+  $self->$method(@args);
+  $self;
+}
+
 1;
 __END__
 =head1 NAME
@@ -79,6 +87,17 @@ most part, methods are literally those provided by MagickWand.  If you need
 more insight about anything, check out the library documentation:
 
 L<https://imagemagick.org/script/magick-wand.php>
+
+=head2 tap
+
+  $wand = $wand->tap(method => @args);
+
+This C<tap> method is included to make chaining easier.
+
+  Magick::Wand->new
+    ->tap(read_image => 'logo:')
+    ->tap(gaussian_blur_image => 2, 0.25)
+    ->write_image('logo.jpg');
 
 =head2 clear
 
