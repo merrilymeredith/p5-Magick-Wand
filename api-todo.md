@@ -241,7 +241,7 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickGetImageVirtualPixelMethod
 - [ ] MagickGetImageWhitePoint
 - [x] MagickGetImageWidth
-- [ ] MagickGetNumberImages
+- [x] MagickGetNumberImages
 - [ ] MagickGetImageTotalInkDensity
 - [ ] MagickHaldClutImage
 - [ ] MagickHasNextImage
@@ -272,7 +272,7 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickMotionBlurImage
 - [ ] MagickNegateImage
 - [ ] MagickNewImage
-- [ ] MagickNextImage
+- [x] MagickNextImage
 - [ ] MagickNormalizeImage
 - [ ] MagickOilPaintImage
 - [ ] MagickOpaquePaintImage
@@ -286,7 +286,7 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickPolynomialImage
 - [ ] MagickPosterizeImage
 - [ ] MagickPreviewImages
-- [ ] MagickPreviousImage
+- [x] MagickPreviousImage
 - [ ] MagickQuantizeImage
 - [ ] MagickQuantizeImages
 - [ ] MagickRangeThresholdImage
@@ -300,7 +300,7 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickRemoveImage
 - [ ] MagickResampleImage
 - [ ] MagickResetImagePage
-- [ ] MagickResizeImage
+- [x] MagickResizeImage
 - [ ] MagickRollImage
 - [ ] MagickRotateImage
 - [ ] MagickSampleImage

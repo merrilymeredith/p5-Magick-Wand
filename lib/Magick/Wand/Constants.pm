@@ -171,6 +171,42 @@ BEGIN {
       ShapeAlphaChannel
       TransparentAlphaChannel
     /};
+
+    $const{FilterType} = {enum qw/
+      UndefinedFilter
+      PointFilter
+      BoxFilter
+      TriangleFilter
+      HermiteFilter
+      HannFilter
+      HammingFilter
+      BlackmanFilter
+      GaussianFilter
+      QuadraticFilter
+      CubicFilter
+      CatromFilter
+      MitchellFilter
+      JincFilter
+      SincFilter
+      SincFastFilter
+      KaiserFilter
+      WelchFilter
+      ParzenFilter
+      BohmanFilter
+      BartlettFilter
+      LagrangeFilter
+      LanczosFilter
+      LanczosSharpFilter
+      Lanczos2Filter
+      Lanczos2SharpFilter
+      RobidouxFilter
+      RobidouxSharpFilter
+      CosineFilter
+      SplineFilter
+      LanczosRadiusFilter
+      CubicSplineFilter
+      SentinelFilter
+    /};
   }
   else {
     $const{AlphaChannelOption} = {enum qw/
@@ -189,6 +225,41 @@ BEGIN {
       RemoveAlphaChannel
       AssociateAlphaChannel
       DisassociateAlphaChannel
+    /};
+
+    $const{FilterType} = {enum qw/
+      UndefinedFilter
+      PointFilter
+      BoxFilter
+      TriangleFilter
+      HermiteFilter
+      HanningFilter
+      HammingFilter
+      BlackmanFilter
+      GaussianFilter
+      QuadraticFilter
+      CubicFilter
+      CatromFilter
+      MitchellFilter
+      JincFilter
+      SincFilter
+      SincFastFilter
+      KaiserFilter
+      WelshFilter
+      ParzenFilter
+      BohmanFilter
+      BartlettFilter
+      LagrangeFilter
+      LanczosFilter
+      LanczosSharpFilter
+      Lanczos2Filter
+      Lanczos2SharpFilter
+      RobidouxFilter
+      RobidouxSharpFilter
+      CosineFilter
+      SplineFilter
+      LanczosRadiusFilter
+      SentinelFilter
     /};
   }
 
