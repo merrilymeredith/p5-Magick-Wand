@@ -147,6 +147,8 @@ package Magick::Wand {
     [MagickGetImageFormat => ['MagickWand'] => 'string'],
     [MagickSetImageFormat => ['MagickWand', 'string'] => 'MagickBooleanType', \&exception_check],
 
+    # TODO: command line and perlmagick have alternate syntax for specifying
+    # geometry, i should try for that too
     [MagickResizeImage => ['MagickWand', 'size_t', 'size_t', 'FilterType'] => 'MagickBooleanType', \&exception_check],
     );
 }
