@@ -71,6 +71,17 @@ more insight about anything, check out the library documentation:
 
 [https://imagemagick.org/script/magick-wand.php](https://imagemagick.org/script/magick-wand.php)
 
+## tap
+
+    $wand = $wand->tap(method => @args);
+
+This `tap` method is included to make chaining easier.
+
+    Magick::Wand->new
+      ->tap(read_image => 'logo:')
+      ->tap(gaussian_blur_image => 2, 0.25)
+      ->write_image('logo.jpg');
+
 ## clear
 
 Clears the wand of images (and properties?)

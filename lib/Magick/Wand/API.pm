@@ -10,7 +10,7 @@ use FFI::Platypus::Buffer qw/buffer_to_scalar/;
 
 use namespace::clean;
 
-my $ffi = FFI::Platypus->new;
+my $ffi = FFI::Platypus->new(api => 1);
 
 $ffi->lib(locate_libs());
 
@@ -38,8 +38,6 @@ $ffi->type('int' => $_) for qw/
   NoiseType
   FilterType
   /;
-
-$ffi->type('int*' => 'ExceptionType_p');
 
 $ffi->custom_type('copied_string' => {
   native_type    => 'opaque',
@@ -108,7 +106,7 @@ package Magick::Wand {
   # Let's also try to wrap to hide "outbound args" and things that are weird to perl
   $ffi->attach(@$_)
     for map {$$_[0] = [$$_[0] => methodize($$_[0])]; $_} (
-    [MagickGetException     => ['MagickWand', 'ExceptionType_p'] => 'copied_string' => sub {
+    [MagickGetException     => ['MagickWand', 'ExceptionType*'] => 'copied_string' => sub {
       my ($sub, $wand) = @_;
       my $xstr = $sub->($wand, \(my $xid));
       $xid, $xstr;
