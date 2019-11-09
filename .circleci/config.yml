@@ -6,5 +6,5 @@ jobs:
     steps:
       - checkout
       - run: apt update && apt install -y --no-install-recommends imagemagick
-      - run: curl -fsSL --compressed https://git.io/cpm | perl - install -g -w 3
+      - run: cpanm --installdeps -n .
       - run: prove -lr
