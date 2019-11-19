@@ -17,11 +17,7 @@ $ffi->lib(locate_libs());
 our $MAGICK_VERSION;  # < 0x700
 $ffi->function(GetMagickVersion => ['size_t*'] => 'string')->call(\$MAGICK_VERSION);
 
-$ffi->custom_type('MagickWand' => {
-  native_type => 'opaque',
-  native_to_perl => sub { bless \$_[0], 'Magick::Wand' },
-  perl_to_native => sub { ${$_[0]} },
-});
+$ffi->type('object(Magick::Wand)' => 'MagickWand');
 
 $ffi->type('opaque' => $_) for qw/
   Image
