@@ -82,6 +82,9 @@ sub tap {
   $self;
 }
 
+sub new_from      { $_[0]->new->tap(read_image      => $_[1]) }
+sub new_from_blob { $_[0]->new->tap(read_image_blob => $_[1]) }
+
 
 ## Convenience functions, scrubbed from namespace
 
@@ -178,6 +181,15 @@ L<https://imagemagick.org/script/exception.php>
   my $wand = Magick::Wand->new;
 
 Your basic constructor.
+
+=head2 new_from
+=head2 new_from_blob
+
+  my $wand = Magick::Wand->new_from('file.jpg');
+
+Shortcuts for:
+
+  my $wand = Magick::Wand->new->tap(read_image => 'file.jpg');
 
 =head1 METHODS
 
