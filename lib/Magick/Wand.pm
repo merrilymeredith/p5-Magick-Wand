@@ -3,9 +3,78 @@ package Magick::Wand;
 use warnings;
 use strict;
 
-use Magick::Wand::API;
+use Magick::Wand::API qw/$ffi/;
 
-## The meat of this class is created in Magick::Wand::API! ##
+sub methodize;
+sub exception_check;
+sub copy_sized_buffer;
+
+use namespace::clean;
+
+$ffi->attach(@$_)
+  for (
+  [[NewMagickWand => 'new']            => [] => 'MagickWand'],
+  [[IsMagickWand  => 'is_magick_wand'] => ['MagickWand'] => 'MagickBooleanType'],
+
+  [[CloneMagickWand   => 'clone']     => ['MagickWand'] => 'MagickWand'],
+  [[ClearMagickWand   => 'clear']     => ['MagickWand'] => 'void'],
+  [[DestroyMagickWand => 'DESTROY'] => ['MagickWand'] => 'void'],
+
+  # I'm not sure there's a use for these if you stay in MagickWand land?
+  # [NewMagickWandFromImage => ['Image'] => 'MagickWand'],
+  # [GetImageFromMagickWand => ['MagickWand'] => 'Image'],
+  # [MagickDestroyImage     => ['Image'] => 'void'],
+  );
+
+# All of the below are attached as snake_case without 'magick_'
+# so MagickReadImage => installed as 'read_image'
+# Let's also try to wrap to hide "outbound args" and things that are weird to perl
+
+$ffi->attach(@$_)
+  for map {$$_[0] = [$$_[0] => methodize($$_[0])]; $_} (
+  [MagickGetException     => ['MagickWand', 'ExceptionType*'] => 'copied_string' => sub {
+    my ($sub, $wand) = @_;
+    my $xstr = $sub->($wand, \(my $xid));
+    $xid, $xstr;
+  }],
+  [MagickGetExceptionType => ['MagickWand'] => 'ExceptionType'],
+  [MagickClearException   => ['MagickWand'] => 'MagickBooleanType'],
+
+  [MagickReadImage => ['MagickWand', 'string'] => 'MagickBooleanType', \&exception_check],
+  [MagickReadImageBlob => ['MagickWand', 'string', 'size_t'] => 'MagickBooleanType' => sub {
+    exception_check(@_, length $_[-1]);
+  }],
+
+  [MagickNextImage        => ['MagickWand'] => 'MagickBooleanType' => \&exception_check],
+  [MagickPreviousImage    => ['MagickWand'] => 'MagickBooleanType' => \&exception_check],
+  [MagickGetNumberImages  => ['MagickWand'] => 'size_t'],
+  [MagickGetIteratorIndex => ['MagickWand'] => 'ssize_t'],
+  [MagickSetIteratorIndex => ['MagickWand', 'ssize_t'] => 'MagickBooleanType', \&exception_check],
+  [MagickSetFirstIterator => ['MagickWand'] => 'void'],
+  [MagickSetLastIterator  => ['MagickWand'] => 'void'],
+  [MagickResetIterator    => ['MagickWand'] => 'void'],
+
+  [MagickGetImage => ['MagickWand'] => 'MagickWand'],
+
+  [MagickWriteImage => ['MagickWand', 'string'] => 'MagickBooleanType', \&exception_check],
+
+  # my $blob = MagickGetImageBlob($wand); - signature differs because of wrapping
+  [MagickGetImageBlob  => ['MagickWand', 'size_t*'] => 'opaque' => \&copy_sized_buffer],
+  [MagickGetImagesBlob => ['MagickWand', 'size_t*'] => 'opaque' => \&copy_sized_buffer],
+
+  [MagickGetImageWidth  => ['MagickWand'] => 'int'],
+  [MagickGetImageHeight => ['MagickWand'] => 'int'],
+
+  [MagickAddImage      => ['MagickWand', 'MagickWand'] => 'MagickBooleanType', \&exception_check],
+  [MagickAddNoiseImage => ['MagickWand', 'NoiseType', 'double'] => 'MagickBooleanType', \&exception_check],
+
+  [MagickGetImageFormat => ['MagickWand'] => 'string'],
+  [MagickSetImageFormat => ['MagickWand', 'string'] => 'MagickBooleanType', \&exception_check],
+
+  # TODO: command line and perlmagick have alternate syntax for specifying
+  # geometry, i should try for that too
+  [MagickResizeImage => ['MagickWand', 'size_t', 'size_t', 'FilterType'] => 'MagickBooleanType', \&exception_check],
+  );
 
 sub tap {
   my ($self, $method, @args) = @_;
@@ -13,8 +82,38 @@ sub tap {
   $self;
 }
 
+
+## Convenience functions, scrubbed from namespace
+
+sub methodize {
+  my $name = $_[0]; $name =~ s/^Magick//;
+  join '_', map {lc} grep {length} split /([A-Z][^A-Z]*)/, $name;
+}
+
+sub exception_check {
+  my ($sub, $wand, @args) = @_;
+  my $rv = $sub->($wand, @args);
+  return $rv if $rv;
+
+  my ($xid, $xstr) = $wand->get_exception;
+  return $rv unless $xid;  # no exception, just a falsey result
+
+  $wand->clear_exception;
+  die "ImageMagick Exception $xid: $xstr"; # TODO: Exception class?
+};
+
+# Only useful if the size is last arg... hm
+sub copy_sized_buffer {
+  my ($sub, @args) = @_;
+  my $ptr = $sub->(@args, \(my $size));
+  my $blob = buffer_to_scalar($ptr, $size);
+  Magick::Wand::API::MagickRelinquishMemory($ptr);
+  $blob;
+};
+
 1;
 __END__
+
 =head1 NAME
 
 Magick::Wand - ImageMagick's MagickWand, via FFI
