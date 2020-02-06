@@ -183,6 +183,7 @@ L<https://imagemagick.org/script/exception.php>
 Your basic constructor.
 
 =head2 new_from
+
 =head2 new_from_blob
 
   my $wand = Magick::Wand->new_from('file.jpg');
