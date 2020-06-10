@@ -4,6 +4,7 @@ use warnings;
 use strict;
 
 use Magick::Wand::API qw/$ffi/;
+use FFI::Platypus::Buffer qw/buffer_to_scalar/;
 
 sub methodize;
 sub exception_check;

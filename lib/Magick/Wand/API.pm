@@ -8,7 +8,6 @@ use parent 'Exporter';
 use File::Spec::Functions qw/catfile/;
 use FFI::CheckLib qw/find_lib/;
 use FFI::Platypus;
-use FFI::Platypus::Buffer qw/buffer_to_scalar/;
 
 use namespace::clean;
 
