@@ -87,6 +87,8 @@ sub new_from      { $_[0]->new->tap(read_image      => $_[1]) }
 sub new_from_blob { $_[0]->new->tap(read_image_blob => $_[1]) }
 
 
+sub get_image_at { $_[0]->tap(set_iterator_index => $_[1])->get_image }
+
 ## Convenience functions, scrubbed from namespace
 
 sub methodize {
