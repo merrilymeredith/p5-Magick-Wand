@@ -69,7 +69,7 @@ $ffi->attach(@$_)
   [MagickAddImage      => ['MagickWand', 'MagickWand'] => 'MagickBooleanType', \&exception_check],
   [MagickAddNoiseImage => ['MagickWand', 'NoiseType', 'double'] => 'MagickBooleanType', \&exception_check],
 
-  [MagickGetImageFormat => ['MagickWand'] => 'string'],
+  [MagickGetImageFormat => ['MagickWand'] => 'copied_string'],
   [MagickSetImageFormat => ['MagickWand', 'string'] => 'MagickBooleanType', \&exception_check],
 
   # TODO: command line and perlmagick have alternate syntax for specifying
