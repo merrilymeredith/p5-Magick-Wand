@@ -81,7 +81,7 @@ $ffi->attach(@$_)
   [MagickResizeImage => ['MagickWand', 'size_t', 'size_t', 'FilterType'] => 'MagickBooleanType', \&exception_check],
   );
 
-method MagickGetOptions => ['MagickWand', 'string', 'size_t*'] => 'opaque' => sub {
+method get_options => ['MagickWand', 'string', 'size_t*'] => 'opaque' => sub {
   push @_, '' if $#_ == 1;  # default for 'string', avoids a segfault
   goto \&copy_sized_string_array;
 };
@@ -93,12 +93,12 @@ sub get_options_hash {
   };
 }
 
-method MagickGetOption => ['MagickWand', 'string'] => 'copied_string' => sub {
+method get_option => ['MagickWand', 'string'] => 'copied_string' => sub {
   return undef unless defined $_[2];
   goto shift;
 };
 
-method MagickGetImageProperties => ['MagickWand', 'string', 'size_t*'] => 'opaque' => sub {
+method get_image_properties => ['MagickWand', 'string', 'size_t*'] => 'opaque' => sub {
   push @_, '' if $#_ == 1;  # default for 'string', avoids a segfault
   goto \&copy_sized_string_array;
 };
@@ -110,7 +110,7 @@ sub get_image_properties_hash {
   };
 }
 
-method MagickGetImageProperty => ['MagickWand', 'string'] => 'copied_string' => sub {
+method get_image_property => ['MagickWand', 'string'] => 'copied_string' => sub {
   return undef unless defined $_[2];
   goto shift;
 };
@@ -131,12 +131,17 @@ sub get_image_at { $_[0]->tap(set_iterator_index => $_[1])->get_image }
 
 sub method {
   my ($name, @etc) = @_;
-  $ffi->attach(ref $name ? $name : [$name => methodize($name)], @etc);
+  $ffi->attach(ref $name ? $name : [demethodize($name) => $name], @etc);
 }
 
 sub methodize {
   my $name = $_[0]; $name =~ s/^Magick//;
   join '_', map {lc} grep {length} split /([A-Z][^A-Z]*)/, $name;
+}
+
+sub demethodize {
+  my $name = shift;
+  return 'Magick' . join '', map { ucfirst lc } split '_', $name;
 }
 
 sub exception_check {
