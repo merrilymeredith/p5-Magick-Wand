@@ -81,6 +81,40 @@ $ffi->attach(@$_)
   [MagickResizeImage => ['MagickWand', 'size_t', 'size_t', 'FilterType'] => 'MagickBooleanType', \&exception_check],
   );
 
+method MagickGetOptions => ['MagickWand', 'string', 'size_t*'] => 'opaque' => sub {
+  push @_, '' if $#_ == 1;  # default for 'string', avoids a segfault
+  goto \&copy_sized_string_array;
+};
+
+sub get_options_hash {
+  my ($self, $pattern) = @_;
+  return {
+    map {$_ => $self->get_option($_)} $self->get_options($pattern)
+  };
+}
+
+method MagickGetOption => ['MagickWand', 'string'] => 'copied_string' => sub {
+  return undef unless defined $_[2];
+  goto shift;
+};
+
+method MagickGetImageProperties => ['MagickWand', 'string', 'size_t*'] => 'opaque' => sub {
+  push @_, '' if $#_ == 1;  # default for 'string', avoids a segfault
+  goto \&copy_sized_string_array;
+};
+
+sub get_image_properties_hash {
+  my ($self, $pattern) = @_;
+  return {
+    map {$_ => $self->get_image_property($_)} $self->get_image_properties($pattern)
+  };
+}
+
+method MagickGetImageProperty => ['MagickWand', 'string'] => 'copied_string' => sub {
+  return undef unless defined $_[2];
+  goto shift;
+};
+
 sub tap {
   my ($self, $method, @args) = @_;
   $self->$method(@args);
@@ -124,7 +158,17 @@ sub copy_sized_buffer {
   my $blob = buffer_to_scalar($ptr, $size);
   Magick::Wand::API::MagickRelinquishMemory($ptr);
   $blob;
-};
+}
+
+sub copy_sized_string_array {
+  my ($sub, @args) = @_;
+  my $ptr = $sub->(@args, \(my $length)); #todo: relinquish memory in a guard?
+  my @res = $length
+    ? @{$ffi->cast('opaque' => "string[$length]", $ptr)}
+    : ();
+  Magick::Wand::API::MagickRelinquishMemory($ptr);
+  @res;
+}
 
 1;
 __END__
