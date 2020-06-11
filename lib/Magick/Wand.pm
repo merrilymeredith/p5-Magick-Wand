@@ -6,9 +6,13 @@ use strict;
 use Magick::Wand::API qw/$ffi/;
 use FFI::Platypus::Buffer qw/buffer_to_scalar/;
 
-sub methodize;
-sub exception_check;
-sub copy_sized_buffer;
+use subs qw/
+  method
+  methodize
+  exception_check
+  copy_sized_buffer
+  copy_sized_string_array
+/;
 
 use namespace::clean;
 
@@ -91,6 +95,11 @@ sub get_image_at { $_[0]->tap(set_iterator_index => $_[1])->get_image }
 
 ## Convenience functions, scrubbed from namespace
 
+sub method {
+  my ($name, @etc) = @_;
+  $ffi->attach(ref $name ? $name : [$name => methodize($name)], @etc);
+}
+
 sub methodize {
   my $name = $_[0]; $name =~ s/^Magick//;
   join '_', map {lc} grep {length} split /([A-Z][^A-Z]*)/, $name;
@@ -106,7 +115,7 @@ sub exception_check {
 
   $wand->clear_exception;
   die "ImageMagick Exception $xid: $xstr"; # TODO: Exception class?
-};
+}
 
 # Only useful if the size is last arg... hm
 sub copy_sized_buffer {
