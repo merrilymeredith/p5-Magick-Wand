@@ -51,19 +51,19 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickGetCopyright
 - [ ] MagickGetFilename
 - [ ] MagickGetFont
-- [ ] MagickGetFormat
+- [X] MagickGetFormat
 - [ ] MagickGetGravity
 - [ ] MagickGetHomeURL
 - [ ] MagickGetImageArtifact
 - [ ] MagickGetImageArtifacts
 - [ ] MagickGetImageProfile
 - [ ] MagickGetImageProfiles
-- [ ] MagickGetImageProperty
-- [ ] MagickGetImageProperties
+- [X] MagickGetImageProperty
+- [X] MagickGetImageProperties
 - [ ] MagickGetInterlaceScheme
 - [ ] MagickGetInterpolateMethod
-- [ ] MagickGetOption
-- [ ] MagickGetOptions
+- [X] MagickGetOption
+- [X] MagickGetOptions
 - [ ] MagickGetOrientation
 - [ ] MagickGetPackageName
 - [ ] MagickGetPage
@@ -90,7 +90,7 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickSetExtract
 - [ ] MagickSetFilename
 - [ ] MagickSetFont
-- [ ] MagickSetFormat
+- [X] MagickSetFormat
 - [ ] MagickSetGravity
 - [ ] MagickSetImageArtifact
 - [ ] MagickSetImageProfile
