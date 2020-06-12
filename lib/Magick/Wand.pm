@@ -9,7 +9,7 @@ use FFI::Platypus::Buffer qw/buffer_to_scalar/;
 use subs qw/
   method
   demethodize
-  exception_check
+  autodie
   copy_sized_buffer
   copy_sized_string_array
 /;
@@ -46,25 +46,25 @@ method get_exception => ['MagickWand', 'ExceptionType*'] => 'copied_string' => s
 method get_exception_type => ['MagickWand'] => 'ExceptionType';
 method clear_exception    => ['MagickWand'] => 'MagickBooleanType';
 
-method read_image => ['MagickWand', 'string'] => 'MagickBooleanType', \&exception_check;
+method read_image => ['MagickWand', 'string'] => 'MagickBooleanType', \&autodie;
 
 # $wand->read_image_blob($blob); - sig differs thanks to wrapper, it adds size
 method read_image_blob => ['MagickWand', 'string', 'size_t'] => 'MagickBooleanType' => sub {
-  exception_check(@_, length $_[-1]);
+  autodie(@_, length $_[-1]);
 };
 
-method next_image         => ['MagickWand'] => 'MagickBooleanType' => \&exception_check;
-method previous_image     => ['MagickWand'] => 'MagickBooleanType' => \&exception_check;
+method next_image         => ['MagickWand'] => 'MagickBooleanType' => \&autodie;
+method previous_image     => ['MagickWand'] => 'MagickBooleanType' => \&autodie;
 method get_number_images  => ['MagickWand'] => 'size_t';
 method get_iterator_index => ['MagickWand'] => 'ssize_t';
-method set_iterator_index => ['MagickWand', 'ssize_t'] => 'MagickBooleanType', \&exception_check;
+method set_iterator_index => ['MagickWand', 'ssize_t'] => 'MagickBooleanType', \&autodie;
 method set_first_iterator => ['MagickWand'] => 'void';
 method set_last_iterator  => ['MagickWand'] => 'void';
 method reset_iterator     => ['MagickWand'] => 'void';
 
 method get_image => ['MagickWand'] => 'MagickWand';
 
-method write_image => ['MagickWand', 'string'] => 'MagickBooleanType', \&exception_check;
+method write_image => ['MagickWand', 'string'] => 'MagickBooleanType', \&autodie;
 
 # my $blob = $wand->get_image_blob; - signature differs because of wrapping, no size ref req'd
 method get_image_blob  => ['MagickWand', 'size_t*'] => 'opaque' => \&copy_sized_buffer;
@@ -73,16 +73,16 @@ method get_images_blob => ['MagickWand', 'size_t*'] => 'opaque' => \&copy_sized_
 method get_image_width  => ['MagickWand'] => 'int';
 method get_image_height => ['MagickWand'] => 'int';
 
-method add_image => ['MagickWand', 'MagickWand'] => 'MagickBooleanType', \&exception_check;
+method add_image => ['MagickWand', 'MagickWand'] => 'MagickBooleanType', \&autodie;
 
-method add_noise_image => ['MagickWand', 'NoiseType', 'double'] => 'MagickBooleanType', \&exception_check;
+method add_noise_image => ['MagickWand', 'NoiseType', 'double'] => 'MagickBooleanType', \&autodie;
 
 method get_image_format => ['MagickWand'] => 'copied_string';
-method set_image_format => ['MagickWand', 'string'] => 'MagickBooleanType', \&exception_check;
+method set_image_format => ['MagickWand', 'string'] => 'MagickBooleanType', \&autodie;
 
 # TODO: command line and perlmagick have alternate syntax for specifying
 # geometry, i should try for that too
-method resize_image => ['MagickWand', 'size_t', 'size_t', 'FilterType'] => 'MagickBooleanType', \&exception_check;
+method resize_image => ['MagickWand', 'size_t', 'size_t', 'FilterType'] => 'MagickBooleanType', \&autodie;
 
 method get_options => ['MagickWand', 'string', 'size_t*'] => 'opaque' => sub {
   push @_, '' if $#_ == 1;  # default for 'string', avoids a segfault
@@ -142,7 +142,7 @@ sub demethodize {
   return 'Magick' . join '', map { ucfirst lc } split '_', $name;
 }
 
-sub exception_check {
+sub autodie {
   my ($sub, $wand, @args) = @_;
   my $rv = $sub->($wand, @args);
   return $rv if $rv;
