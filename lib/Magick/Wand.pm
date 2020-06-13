@@ -17,6 +17,8 @@ use subs qw/
 
 use namespace::clean;
 
+## Wand Methods
+
 method [NewMagickWand => 'new'] => [] => 'MagickWand';
 
 sub new_from      { $_[0]->new->tap(read_image      => $_[1]) }
@@ -76,21 +78,20 @@ method write_image => ['MagickWand', 'string'] => 'MagickBooleanType', \&autodie
 method get_image_blob  => ['MagickWand', 'size_t*'] => 'opaque' => \&copy_sized_buffer;
 method get_images_blob => ['MagickWand', 'size_t*'] => 'opaque' => \&copy_sized_buffer;
 
+method add_image => ['MagickWand', 'MagickWand'] => 'MagickBooleanType', \&autodie;
+
+method add_noise_image => ['MagickWand', 'NoiseType', 'double'] => 'MagickBooleanType', \&autodie;
+
+
+## Property methods
+
 method get_image_width  => ['MagickWand'] => 'int';
 method get_image_height => ['MagickWand'] => 'int';
 
 sub get_image_geometry { $_[0]->get_image_width, $_[0]->get_image_height }
 
-method add_image => ['MagickWand', 'MagickWand'] => 'MagickBooleanType', \&autodie;
-
-method add_noise_image => ['MagickWand', 'NoiseType', 'double'] => 'MagickBooleanType', \&autodie;
-
 method get_image_format => ['MagickWand'] => 'copied_string';
 method set_image_format => ['MagickWand', 'string'] => 'MagickBooleanType', \&autodie;
-
-# TODO: command line and perlmagick have alternate syntax for specifying
-# geometry, i should try for that too
-method resize_image => ['MagickWand', 'size_t', 'size_t', 'FilterType'] => 'MagickBooleanType', \&autodie;
 
 method get_options => ['MagickWand', 'string', 'size_t*'] => 'opaque' => sub {
   push @_, '' if $#_ == 1;  # default for 'string', avoids a segfault
@@ -126,7 +127,15 @@ method get_image_property => ['MagickWand', 'string'] => 'copied_string' => sub 
   goto shift;
 };
 
+
+## Image Methods
+
 method auto_orient_image => ['MagickWand'] => 'MagickBooleanType';
+
+# TODO: command line and perlmagick have alternate syntax for specifying
+# geometry, i should try for that too
+method resize_image => ['MagickWand', 'size_t', 'size_t', 'FilterType'] => 'MagickBooleanType', \&autodie;
+
 
 sub tap {
   my ($self, $method, @args) = @_;
