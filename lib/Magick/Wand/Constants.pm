@@ -152,6 +152,35 @@ BEGIN {
     /},
   );
 
+  $const{DisposeType} = {
+    UnrecognizedDispose => 0,
+    enum qw/
+      UndefinedDispose
+      NoneDispose
+      BackgroundDispose
+      PreviousDispose
+  /};
+
+  $const{LayerMethod} = {enum qw/
+    UndefinedLayer
+    CoalesceLayer
+    CompareAnyLayer
+    CompareClearLayer
+    CompareOverlayLayer
+    DisposeLayer
+    OptimizeLayer
+    OptimizeImageLayer
+    OptimizePlusLayer
+    OptimizeTransLayer
+    RemoveDupsLayer
+    RemoveZeroLayer
+    CompositeLayer
+    MergeLayer
+    FlattenLayer
+    MosaicLayer
+    TrimBoundsLayer
+  /};
+
   if ($Magick::Wand::API::MAGICK_VERSION >= 0x700) {
     $const{AlphaChannelOption} = {enum qw/
       UndefinedAlphaChannel

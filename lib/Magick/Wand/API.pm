@@ -41,6 +41,8 @@ $ffi->type('int' => $_) for qw/
   OrientationType
   NoiseType
   FilterType
+  DisposeType
+  LayerMethod
   /;
 
 $ffi->custom_type('copied_string' => {
