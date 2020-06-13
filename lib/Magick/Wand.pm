@@ -1,5 +1,53 @@
 package Magick::Wand;
 
+=head1 NAME
+
+Magick::Wand - ImageMagick's MagickWand, via FFI
+
+=head1 WARNING
+
+We're just getting started here!
+
+MagickWand by way of L<FFI::Platypus>.
+
+Not on CPAN yet and the interface should not be considered stable.
+
+=head1 SYNOPSIS
+
+  use Magick::Wand;
+
+  for my $file (glob '*.jpg') {
+    my $w = Magick::Wand->new;
+    $w->read_image($file);
+    $w->auto_orient_image;
+    $w->write_image($file);
+  }
+
+=head1 DESCRIPTION
+
+MagickWand is the library and API that ImageMagick recommends for use.
+C<Magick::Wand> is an interface to MagickWand using L<FFI::Platypus>.
+MagickWand is an object-like pattern so it maps nicely to one Perl object per
+instance of a Wand.
+
+Unlike PerlMagick (aka L<Image::Magick>), Magick::Wand does not itself need
+a C compiler, nor is it bundled into the ImageMagick source distribution and
+tied to specific versions of ImageMagick - all troublesome when working on
+Windows.
+
+=head1 BEHAVIOR
+
+=head2 Errors
+
+Magick::Wand tries to throw exceptions on error.  MagickWand has the concept of
+a warning, and I still need to sort out how that is handled.
+
+ImageMagick error IDs are classified:
+
+L<https://imagemagick.org/script/exception.php>
+
+=cut
+
 use warnings;
 use strict;
 
@@ -17,7 +65,27 @@ use subs qw/
 
 use namespace::clean;
 
-## Wand Methods
+=head1 CLASS METHODS
+
+=head2 new
+
+  my $wand = Magick::Wand->new;
+
+Your basic constructor.
+
+=head2 new_from
+
+=head2 new_from_blob
+
+  my $wand = Magick::Wand->new_from('file.jpg');
+
+Shortcuts for:
+
+  my $wand = Magick::Wand->new->tap(read_image => 'file.jpg');
+
+See also: L</read_image>, L</read_image_blob>
+
+=cut
 
 method [NewMagickWand => 'new'] => [] => 'MagickWand';
 
@@ -26,9 +94,106 @@ sub new_from_blob { $_[0]->new->tap(read_image_blob => $_[1]) }
 
 method [DestroyMagickWand => 'DESTROY'] => ['MagickWand'] => 'void';
 
-method [CloneMagickWand => 'clone'] => ['MagickWand'] => 'MagickWand';
+=head1 METHODS
+
+We do some light wrapping to hide things that aren't very Perlish, but for the
+most part, methods are literally those provided by MagickWand.  If you need
+more insight about anything, check out the library documentation:
+
+L<https://imagemagick.org/script/magick-wand.php>
+
+=head2 tap
+
+  $wand = $wand->tap(method => @args);
+
+This C<tap> method is included to make chaining easier.
+
+  Magick::Wand->new
+    ->tap(read_image => 'logo:')
+    ->tap(gaussian_blur_image => 2, 0.25)
+    ->write_image('logo.jpg');
+
+=cut
+
+sub tap {
+  my ($self, $method, @args) = @_;
+  $self->$method(@args);
+  $self;
+}
+
+=head2 clear
+
+Clears the wand of images (and properties?)
+
+=cut
 
 method [ClearMagickWand => 'clear'] => ['MagickWand'] => 'void';
+
+=head2 clone
+
+Returns a clone of the wand.
+
+=cut
+
+method [CloneMagickWand => 'clone'] => ['MagickWand'] => 'MagickWand';
+
+=head2 get_exception
+
+  my ($xstr, $xid) = $wand->get_exception;
+
+Returns current exception string and exception id, if any. (See L</Errors>)
+
+=cut
+
+method get_exception => ['MagickWand', 'ExceptionType*'] => 'copied_string' => sub {
+  my ($sub, $wand) = @_;
+  my $xstr = $sub->($wand, \(my $xid));
+  $xid, $xstr;
+};
+
+=head2 get_exception_id
+
+  my $xid = $wand->get_exception_id;
+
+Returns current exception id, if any. (See L</Errors>)
+
+=cut
+
+method get_exception_type => ['MagickWand'] => 'ExceptionType';
+
+=head2 clear_exception
+
+Clears current exception.
+
+=cut
+
+method clear_exception    => ['MagickWand'] => 'MagickBooleanType';
+
+=head2 read_image
+
+  $wand->read_image('path/to/file.png');
+  $wand->read_image('logo:');
+  $wand->read_image('http://foo.baz/image.jpg');
+
+Given a file path or URL, attempts to read the image and add its layers to the
+wand at the current index.
+
+=cut
+
+method read_image => ['MagickWand', 'string'] => 'MagickBooleanType', \&autodie;
+
+=head2 read_image_blob
+
+  $wand->read_image_blob($binary_string);
+
+The same as L</read_image>, but for data already in memory.
+
+=cut
+
+# $wand->read_image_blob($blob); - sig differs thanks to wrapper, it adds size
+method read_image_blob => ['MagickWand', 'string', 'size_t'] => 'MagickBooleanType' => sub {
+  autodie(@_, length $_[-1]);
+};
 
 method [IsMagickWand => 'is_magick_wand'] => ['MagickWand'] => 'MagickBooleanType';
 
@@ -39,25 +204,30 @@ method [IsMagickWand => 'is_magick_wand'] => ['MagickWand'] => 'MagickBooleanTyp
 # This "Image" would be a distinct class too.  Getting an image in the wand api
 # returns a wand.
 
+=head2 Image Stack
 
-# All of the below are attached as snake_case without 'magick_'
-# so MagickReadImage => installed as 'read_image'
-# Let's also try to wrap to hide "outbound args" and things that are weird to perl
+Each Wand holds one or more images, and has an "iterator", which is like the
+currently selected image in the stack.  Many operations work on the currently
+selected image, or insert new images at the current selection.  This group of
+methods deals with the stack.
 
-method get_exception => ['MagickWand', 'ExceptionType*'] => 'copied_string' => sub {
-  my ($sub, $wand) = @_;
-  my $xstr = $sub->($wand, \(my $xid));
-  $xid, $xstr;
-};
-method get_exception_type => ['MagickWand'] => 'ExceptionType';
-method clear_exception    => ['MagickWand'] => 'MagickBooleanType';
+=head3 next_image
 
-method read_image => ['MagickWand', 'string'] => 'MagickBooleanType', \&autodie;
+=head3 previous_image
 
-# $wand->read_image_blob($blob); - sig differs thanks to wrapper, it adds size
-method read_image_blob => ['MagickWand', 'string', 'size_t'] => 'MagickBooleanType' => sub {
-  autodie(@_, length $_[-1]);
-};
+=head3 get_number_images
+
+=head3 get_iterator_index
+
+=head3 set_iterator_index
+
+=head3 set_first_iterator
+
+=head3 set_last_iterator
+
+=head3 reset_iterator
+
+=cut
 
 method next_image         => ['MagickWand'] => 'MagickBooleanType' => \&autodie;
 method previous_image     => ['MagickWand'] => 'MagickBooleanType' => \&autodie;
@@ -67,6 +237,7 @@ method set_iterator_index => ['MagickWand', 'ssize_t'] => 'MagickBooleanType', \
 method set_first_iterator => ['MagickWand'] => 'void';
 method set_last_iterator  => ['MagickWand'] => 'void';
 method reset_iterator     => ['MagickWand'] => 'void';
+
 
 method get_image => ['MagickWand'] => 'MagickWand';
 
@@ -153,11 +324,6 @@ method scale_image    => ['MagickWand', 'size_t', 'size_t'] => 'MagickBooleanTyp
 method thumbnail_image => ['MagickWand', 'size_t', 'size_t'] => 'MagickBooleanType' => \&autodie;
 
 
-sub tap {
-  my ($self, $method, @args) = @_;
-  $self->$method(@args);
-  $self;
-}
 
 
 ## Convenience functions, scrubbed from namespace
@@ -187,148 +353,13 @@ sub autodie {
 1;
 __END__
 
-=head1 NAME
-
-Magick::Wand - ImageMagick's MagickWand, via FFI
-
-=head1 WARNING
-
-We're just getting started here!
-
-MagickWand by way of L<FFI::Platypus>.
-
-Not on CPAN yet and the interface should not be considered stable.
-
-=head1 SYNOPSIS
-
-  use Magick::Wand;
-
-  for my $file (glob '*.jpg') {
-    my $w = Magick::Wand->new;
-    $w->read_image($file);
-    $w->auto_orient_image;
-    $w->write_image($file);
-  }
-
-=head1 DESCRIPTION
-
-MagickWand is the library and API that ImageMagick recommends for use.
-C<Magick::Wand> is an interface to MagickWand using L<FFI::Platypus>.
-MagickWand is an object-like pattern so it maps nicely to one Perl object per
-instance of a Wand.
-
-Unlike PerlMagick (aka L<Image::Magick>), Magick::Wand does not itself need
-a C compiler, nor is it bundled into the ImageMagick source distribution and
-tied to specific versions of ImageMagick - all troublesome when working on
-Windows.
-
-=head1 BEHAVIOR
-
-=head2 Image Stack
-
-Each Wand holds one or more images, and has an "iterator", which is like the
-currently selected image in the stack.  Many operations work on the currently
-selected image, or insert new images at the current selection.  There is
-a group of methods dealing with this:
-
-L</next_image>, L</previous_image>, L</get_number_images>,
-L</get_iterator_index>, L</set_iterator_index>, L</set_first_iterator>,
-L</set_last_iterator>, L</reset_iterator>
-
-=head2 Errors
-
-Magick::Wand throws exceptions on error.  MagickWand has the concept of
-a warning, and I still need to sort out how that is handled.
-
-ImageMagick error IDs are classified:
-
-L<https://imagemagick.org/script/exception.php>
-
-=head1 CLASS METHODS
-
-=head2 new
-
-  my $wand = Magick::Wand->new;
-
-Your basic constructor.
-
-=head2 new_from
-
-=head2 new_from_blob
-
-  my $wand = Magick::Wand->new_from('file.jpg');
-
-Shortcuts for:
-
-  my $wand = Magick::Wand->new->tap(read_image => 'file.jpg');
-
-=head1 METHODS
-
-We do some light wrapping to hide things that aren't very Perlish, but for the
-most part, methods are literally those provided by MagickWand.  If you need
-more insight about anything, check out the library documentation:
-
-L<https://imagemagick.org/script/magick-wand.php>
-
-=head2 tap
-
-  $wand = $wand->tap(method => @args);
-
-This C<tap> method is included to make chaining easier.
-
-  Magick::Wand->new
-    ->tap(read_image => 'logo:')
-    ->tap(gaussian_blur_image => 2, 0.25)
-    ->write_image('logo.jpg');
-
-=head2 clear
-
-Clears the wand of images (and properties?)
-
-=head2 clone
-
-Returns a clone of the wand.
-
-=head2 read_image
-
-  $wand->read_image('path/to/file.png');
-  $wand->read_image('logo:');
-  $wand->read_image('http://foo.baz/image.jpg');
-
-Given a file path or URL, attempts to read the image and add its layers to the
-wand at the current index.
-
-=head2 read_image_blob
-
-  $wand->read_image_blob($binary_string);
-
-The same as L</read_image>, but for data already in memory.
-
-=head2 get_exception
-
-  my ($xstr, $xid) = $wand->get_exception;
-
-Returns current exception string and exception id, if any. (See L</Errors>)
-
-=head2 get_exception_id
-
-  my $xid = $wand->get_exception_id;
-
-Returns current exception id, if any. (See L</Errors>)
-
-=head2 clear_exception
-
-Clears current exception.
-
-...
-
 =head1 AUTHOR
 
 Meredith Howard <mhoward@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Meredith Howard.
+This software is copyright (c) 2020 by Meredith Howard.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
