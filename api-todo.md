@@ -263,7 +263,7 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickLocalContrastImage
 - [ ] MagickMagnifyImage
 - [ ] MagickMeanShiftImage
-- [ ] MagickMergeImageLayers
+- [X] MagickMergeImageLayers
 - [ ] MagickMinifyImage
 - [ ] MagickModulateImage
 - [ ] MagickMontageImage

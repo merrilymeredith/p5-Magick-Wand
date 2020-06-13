@@ -135,6 +135,8 @@ method get_image_property => ['MagickWand', 'string'] => 'copied_string' => sub 
 
 method auto_orient_image => ['MagickWand'] => 'MagickBooleanType';
 
+method merge_image_layers => ['MagickWand', 'LayerMethod'] => 'MagickWand' => \&autodie;
+
 # TODO: command line and perlmagick have alternate syntax for specifying
 # geometry, i should try for that too
 method resize_image => ['MagickWand', 'size_t', 'size_t', 'FilterType'] => 'MagickBooleanType', \&autodie;
