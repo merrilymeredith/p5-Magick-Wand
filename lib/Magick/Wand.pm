@@ -78,6 +78,8 @@ method get_images_blob => ['MagickWand', 'size_t*'] => 'opaque' => \&copy_sized_
 method get_image_width  => ['MagickWand'] => 'int';
 method get_image_height => ['MagickWand'] => 'int';
 
+sub get_image_geometry { $_[0]->get_image_width, $_[0]->get_image_height }
+
 method add_image => ['MagickWand', 'MagickWand'] => 'MagickBooleanType', \&autodie;
 
 method add_noise_image => ['MagickWand', 'NoiseType', 'double'] => 'MagickBooleanType', \&autodie;
