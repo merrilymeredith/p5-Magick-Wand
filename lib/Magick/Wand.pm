@@ -18,6 +18,9 @@ use namespace::clean;
 
 method [NewMagickWand => 'new'] => [] => 'MagickWand';
 
+sub new_from      { $_[0]->new->tap(read_image      => $_[1]) }
+sub new_from_blob { $_[0]->new->tap(read_image_blob => $_[1]) }
+
 method [DestroyMagickWand => 'DESTROY'] => ['MagickWand'] => 'void';
 
 method [CloneMagickWand => 'clone'] => ['MagickWand'] => 'MagickWand';
@@ -63,6 +66,8 @@ method set_last_iterator  => ['MagickWand'] => 'void';
 method reset_iterator     => ['MagickWand'] => 'void';
 
 method get_image => ['MagickWand'] => 'MagickWand';
+
+sub get_image_at { $_[0]->tap(set_iterator_index => $_[1])->get_image }
 
 method write_image => ['MagickWand', 'string'] => 'MagickBooleanType', \&autodie;
 
@@ -124,11 +129,6 @@ sub tap {
   $self;
 }
 
-sub new_from      { $_[0]->new->tap(read_image      => $_[1]) }
-sub new_from_blob { $_[0]->new->tap(read_image_blob => $_[1]) }
-
-
-sub get_image_at { $_[0]->tap(set_iterator_index => $_[1])->get_image }
 
 ## Convenience functions, scrubbed from namespace
 
