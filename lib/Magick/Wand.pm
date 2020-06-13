@@ -80,6 +80,9 @@ method get_images_blob => ['MagickWand', 'size_t*'] => 'opaque' => \&copy_sized_
 
 method add_image => ['MagickWand', 'MagickWand'] => 'MagickBooleanType', \&autodie;
 
+sub add_image_from      { $_[0]->add_image($_[0]->new_from($_[1])) }
+sub add_image_from_blob { $_[0]->add_image($_[0]->new_from_blob($_[1])) }
+
 method add_noise_image => ['MagickWand', 'NoiseType', 'double'] => 'MagickBooleanType', \&autodie;
 
 
