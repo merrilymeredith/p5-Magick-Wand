@@ -264,7 +264,7 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickMagnifyImage
 - [ ] MagickMeanShiftImage
 - [X] MagickMergeImageLayers
-- [ ] MagickMinifyImage
+- [X] MagickMinifyImage
 - [ ] MagickModulateImage
 - [ ] MagickMontageImage
 - [ ] MagickMorphImages
@@ -298,13 +298,13 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickReadImageFile
 - [ ] MagickRemapImage
 - [ ] MagickRemoveImage
-- [ ] MagickResampleImage
+- [X] MagickResampleImage
 - [ ] MagickResetImagePage
 - [X] MagickResizeImage
 - [ ] MagickRollImage
 - [ ] MagickRotateImage
-- [ ] MagickSampleImage
-- [ ] MagickScaleImage
+- [X] MagickSampleImage
+- [X] MagickScaleImage
 - [ ] MagickSegmentImage
 - [ ] MagickSelectiveBlurImage
 - [ ] MagickSeparateImage
@@ -372,7 +372,7 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickSwirlImage
 - [ ] MagickTextureImage
 - [ ] MagickThresholdImage
-- [ ] MagickThumbnailImage
+- [X] MagickThumbnailImage
 - [ ] MagickTintImage
 - [ ] MagickTransformImageColorspace
 - [ ] MagickTransparentPaintImage

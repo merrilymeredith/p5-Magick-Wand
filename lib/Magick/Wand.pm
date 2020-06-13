@@ -139,7 +139,18 @@ method merge_image_layers => ['MagickWand', 'LayerMethod'] => 'MagickWand' => \&
 
 # TODO: command line and perlmagick have alternate syntax for specifying
 # geometry, i should try for that too
-method resize_image => ['MagickWand', 'size_t', 'size_t', 'FilterType'] => 'MagickBooleanType', \&autodie;
+
+method minify_image => ['MagickWand'] => 'MagickBooleanType' => \&autodie;
+
+method resize_image   => ['MagickWand', 'size_t', 'size_t', 'FilterType'] => 'MagickBooleanType' => \&autodie;
+
+method resample_image => ['MagickWand', 'size_t', 'size_t'] => 'MagickBooleanType' => \&autodie;
+
+method sample_image   => ['MagickWand', 'size_t', 'size_t'] => 'MagickBooleanType' => \&autodie;
+
+method scale_image    => ['MagickWand', 'size_t', 'size_t'] => 'MagickBooleanType' => \&autodie;
+
+method thumbnail_image => ['MagickWand', 'size_t', 'size_t'] => 'MagickBooleanType' => \&autodie;
 
 
 sub tap {
