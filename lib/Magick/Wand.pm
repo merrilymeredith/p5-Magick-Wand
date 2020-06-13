@@ -126,6 +126,8 @@ method get_image_property => ['MagickWand', 'string'] => 'copied_string' => sub 
   goto shift;
 };
 
+method auto_orient_image => ['MagickWand'] => 'MagickBooleanType';
+
 sub tap {
   my ($self, $method, @args) = @_;
   $self->$method(@args);

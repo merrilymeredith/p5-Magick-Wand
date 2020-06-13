@@ -7,36 +7,36 @@ https://imagemagick.org/script/magick-wand.php
 ## Needs Follow-up
 
 - [ ] MagickGetException
-  - [x] Need to release a string returned
+  - [X] Need to release a string returned
   - [ ] we have an autodie thing, it should be smarter about 
       warn/error/fatal
 
 ## magick-wand
 
-- [x] ClearMagickWand
-- [x] CloneMagickWand
-- [x] DestroyMagickWand
-- [x] IsMagickWand
-- [x] MagickClearException
-- [x] MagickGetException
-- [x] MagickGetExceptionType
-- [x] MagickGetIteratorIndex
+- [X] ClearMagickWand
+- [X] CloneMagickWand
+- [X] DestroyMagickWand
+- [X] IsMagickWand
+- [X] MagickClearException
+- [X] MagickGetException
+- [X] MagickGetExceptionType
+- [X] MagickGetIteratorIndex
 - [ ] MagickQueryConfigureOption
 - [ ] MagickQueryConfigureOptions
 - [ ] MagickQueryFontMetrics
 - [ ] MagickQueryMultilineFontMetrics
 - [ ] MagickQueryFonts
 - [ ] MagickQueryFormats
-- [x] MagickRelinquishMemory
-- [x] MagickResetIterator
-- [x] MagickSetFirstIterator
-- [x] MagickSetIteratorIndex
-- [x] MagickSetLastIterator
-- [x] MagickWandGenesis
-- [x] MagickWandTerminus
-- [x] NewMagickWand
+- [X] MagickRelinquishMemory
+- [X] MagickResetIterator
+- [X] MagickSetFirstIterator
+- [X] MagickSetIteratorIndex
+- [X] MagickSetLastIterator
+- [X] MagickWandGenesis
+- [X] MagickWandTerminus
+- [X] NewMagickWand
 - [-] NewMagickWandFromImage
-- [x] IsMagickWandInstantiated
+- [X] IsMagickWandInstantiated
 
 ## magick-property
 
@@ -119,15 +119,15 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickAdaptiveResizeImage
 - [ ] MagickAdaptiveSharpenImage
 - [ ] MagickAdaptiveThresholdImage
-- [x] MagickAddImage
-- [x] MagickAddNoiseImage
+- [X] MagickAddImage
+- [X] MagickAddNoiseImage
 - [ ] MagickAffineTransformImage
 - [ ] MagickAnnotateImage
 - [ ] MagickAnimateImages
 - [ ] MagickAppendImages
 - [ ] MagickAutoGammaImage
 - [ ] MagickAutoLevelImage
-- [ ] MagickAutoOrientImage
+- [X] MagickAutoOrientImage
 - [ ] MagickAutoThresholdImage
 - [ ] MagickBlackThresholdImage
 - [ ] MagickBlueShiftImage
@@ -188,12 +188,12 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickFxImage
 - [ ] MagickGammaImage
 - [ ] MagickGaussianBlurImage
-- [x] MagickGetImage
+- [X] MagickGetImage
 - [ ] MagickGetImageAlphaChannel
 - [ ] MagickGetImageMask
 - [ ] MagickGetImageBackgroundColor
-- [x] MagickGetImageBlob
-- [x] MagickGetImagesBlob
+- [X] MagickGetImageBlob
+- [X] MagickGetImagesBlob
 - [ ] MagickGetImageBluePrimary
 - [ ] MagickGetImageBorderColor
 - [ ] MagickGetImageFeatures
@@ -214,12 +214,12 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickGetImageDistortions
 - [ ] MagickGetImageEndian
 - [ ] MagickGetImageFilename
-- [x] MagickGetImageFormat
+- [X] MagickGetImageFormat
 - [ ] MagickGetImageFuzz
 - [ ] MagickGetImageGamma
 - [ ] MagickGetImageGravity
 - [ ] MagickGetImageGreenPrimary
-- [x] MagickGetImageHeight
+- [X] MagickGetImageHeight
 - [ ] MagickGetImageHistogram
 - [ ] MagickGetImageInterlaceScheme
 - [ ] MagickGetImageInterpolateMethod
@@ -240,8 +240,8 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickGetImageUnits
 - [ ] MagickGetImageVirtualPixelMethod
 - [ ] MagickGetImageWhitePoint
-- [x] MagickGetImageWidth
-- [x] MagickGetNumberImages
+- [X] MagickGetImageWidth
+- [X] MagickGetNumberImages
 - [ ] MagickGetImageTotalInkDensity
 - [ ] MagickHaldClutImage
 - [ ] MagickHasNextImage
@@ -272,7 +272,7 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickMotionBlurImage
 - [ ] MagickNegateImage
 - [ ] MagickNewImage
-- [x] MagickNextImage
+- [X] MagickNextImage
 - [ ] MagickNormalizeImage
 - [ ] MagickOilPaintImage
 - [ ] MagickOpaquePaintImage
@@ -286,21 +286,21 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickPolynomialImage
 - [ ] MagickPosterizeImage
 - [ ] MagickPreviewImages
-- [x] MagickPreviousImage
+- [X] MagickPreviousImage
 - [ ] MagickQuantizeImage
 - [ ] MagickQuantizeImages
 - [ ] MagickRangeThresholdImage
 - [ ] MagickRotationalBlurImage
 - [ ] MagickRaiseImage
 - [ ] MagickRandomThresholdImage
-- [x] MagickReadImage
-- [x] MagickReadImageBlob
+- [X] MagickReadImage
+- [X] MagickReadImageBlob
 - [ ] MagickReadImageFile
 - [ ] MagickRemapImage
 - [ ] MagickRemoveImage
 - [ ] MagickResampleImage
 - [ ] MagickResetImagePage
-- [x] MagickResizeImage
+- [X] MagickResizeImage
 - [ ] MagickRollImage
 - [ ] MagickRotateImage
 - [ ] MagickSampleImage
@@ -328,7 +328,7 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickSetImageEndian
 - [ ] MagickSetImageExtent
 - [ ] MagickSetImageFilename
-- [x] MagickSetImageFormat
+- [X] MagickSetImageFormat
 - [ ] MagickSetImageFuzz
 - [ ] MagickSetImageGamma
 - [ ] MagickSetImageGravity
@@ -385,7 +385,7 @@ https://imagemagick.org/script/magick-wand.php
 - [ ] MagickWaveImage
 - [ ] MagickWaveletDenoiseImage
 - [ ] MagickWhiteThresholdImage
-- [x] MagickWriteImage
+- [X] MagickWriteImage
 - [ ] MagickWriteImageFile
 - [ ] MagickWriteImages
 - [ ] MagickWriteImagesFile
