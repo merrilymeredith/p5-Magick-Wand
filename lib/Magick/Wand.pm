@@ -3,15 +3,16 @@ package Magick::Wand;
 use warnings;
 use strict;
 
-use Magick::Wand::API qw/$ffi/;
-use FFI::Platypus::Buffer qw/buffer_to_scalar/;
+use Magick::Wand::API qw/
+  $ffi
+  copy_sized_buffer
+  copy_sized_string_array
+/;
 
 use subs qw/
   method
   demethodize
   autodie
-  copy_sized_buffer
-  copy_sized_string_array
 /;
 
 use namespace::clean;
@@ -154,25 +155,6 @@ sub autodie {
 
   $wand->clear_exception;
   die "ImageMagick Exception $xid: $xstr"; # TODO: Exception class?
-}
-
-# Only useful if the size is last arg... hm
-sub copy_sized_buffer {
-  my ($sub, @args) = @_;
-  my $ptr = $sub->(@args, \(my $size));
-  my $blob = buffer_to_scalar($ptr, $size);
-  Magick::Wand::API::MagickRelinquishMemory($ptr);
-  $blob;
-}
-
-sub copy_sized_string_array {
-  my ($sub, @args) = @_;
-  my $ptr = $sub->(@args, \(my $length)); #todo: relinquish memory in a guard?
-  my @res = $length
-    ? @{$ffi->cast('opaque' => "string[$length]", $ptr)}
-    : ();
-  Magick::Wand::API::MagickRelinquishMemory($ptr);
-  @res;
 }
 
 1;

@@ -8,10 +8,15 @@ use parent 'Exporter';
 use File::Spec::Functions qw/catfile/;
 use FFI::CheckLib qw/find_lib/;
 use FFI::Platypus;
+use FFI::Platypus::Buffer qw/buffer_to_scalar/;
 
 use namespace::clean;
 
-our @EXPORT_OK = qw/$ffi/;
+our @EXPORT_OK = qw/
+  $ffi
+  copy_sized_buffer
+  copy_sized_string_array
+/;
 
 our $ffi = FFI::Platypus->new(api => 1);
 
@@ -98,5 +103,25 @@ END {
     MagickWandTerminus() if $f->();
   }
 };
+
+
+# Only useful if the size is last arg... hm
+sub copy_sized_buffer {
+  my ($sub, @args) = @_;
+  my $ptr = $sub->(@args, \(my $size));
+  my $blob = buffer_to_scalar($ptr, $size);
+  Magick::Wand::API::MagickRelinquishMemory($ptr);
+  $blob;
+}
+
+sub copy_sized_string_array {
+  my ($sub, @args) = @_;
+  my $ptr = $sub->(@args, \(my $length)); #todo: relinquish memory in a guard?
+  my @res = $length
+    ? @{$ffi->cast('opaque' => "string[$length]", $ptr)}
+    : ();
+  Magick::Wand::API::MagickRelinquishMemory($ptr);
+  @res;
+}
 
 1;
