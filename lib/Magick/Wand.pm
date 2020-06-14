@@ -98,20 +98,6 @@ sub new_from_blob { (ref $_[0] || $_[0])->new->tap(read_image_blob => $_[1]) }
 
 attach [DestroyMagickWand => 'DESTROY'] => ['MagickWand'] => 'void';
 
-=head1 PRIVATE METHODS
-
-=head2 _throw
-
-This method is called to throw an exception, its default behavior is to croak.
-You can create a subclass that overrides C<_throw>.
-
-=cut
-
-sub _throw {
-  my ($self, $xid, $xstr) = @_;
-  croak "ImageMagick Exception $xid: $xstr";
-}
-
 =head1 METHODS
 
 We do some light wrapping to hide things that aren't very Perlish, but for the
@@ -342,7 +328,22 @@ method scale_image    => ['MagickWand', 'size_t', 'size_t'] => 'MagickBooleanTyp
 method thumbnail_image => ['MagickWand', 'size_t', 'size_t'] => 'MagickBooleanType';
 
 
-## Convenience functions, scrubbed from namespace
+=head1 PRIVATE METHODS
+
+=head2 _throw
+
+This method is called to throw an exception, its default behavior is to croak.
+You can create a subclass that overrides C<_throw>.
+
+=cut
+
+sub _throw {
+  my ($self, $xid, $xstr) = @_;
+  croak "ImageMagick Exception $xid: $xstr";
+}
+
+
+## Convenience functions, these are namespace::cleaned
 
 # Shortcut for ffi attach
 sub attach {
@@ -392,7 +393,7 @@ Meredith Howard <mhoward@cpan.org>
 
 This software is copyright (c) 2020 by Meredith Howard.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.
 
 =cut
