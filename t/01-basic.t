@@ -28,16 +28,4 @@ subtest 'basics' => sub {
   ok lives { undef $w }, 'no surprises with DESTROY';
 };
 
-subtest 'false-not-always-an-exception' => sub {
-  my $w = Magick::Wand->new;
-
-  ok dies { $w->next_image },
-    'next_image is an exception when empty';
-
-  $w->read_image('logo:');
-
-  ok lives { $w->next_image; $w->next_image },
-    'but not an exception when false and looping around';
-};
-
 done_testing;

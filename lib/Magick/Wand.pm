@@ -38,8 +38,10 @@ Windows.
 
 =head2 Errors
 
-Magick::Wand tries to throw exceptions on error.  MagickWand has the concept of
-a warning, and I still need to sort out how that is handled.
+MagickWand the library is based around explicitly checking for exceptions after
+an operation, while here we try to throw perl exceptions automatically.
+MagickWand has the concept of a warning, and right now that's treated equally
+with more severe errors.  See also: L</_throw>.
 
 ImageMagick error IDs are classified:
 
@@ -56,7 +58,10 @@ use Magick::Wand::API qw/
   copy_sized_string_array
 /;
 
+use Carp qw/croak/;
+
 use subs qw/
+  attach
   method
   demethodize
   autodie
@@ -86,12 +91,26 @@ See also: L</read_image>, L</read_image_blob>
 
 =cut
 
-method [NewMagickWand => 'new'] => [] => 'MagickWand';
+attach [NewMagickWand => 'new'] => [] => 'MagickWand';
 
-sub new_from      { $_[0]->new->tap(read_image      => $_[1]) }
-sub new_from_blob { $_[0]->new->tap(read_image_blob => $_[1]) }
+sub new_from      { (ref $_[0] || $_[0])->new->tap(read_image      => $_[1]) }
+sub new_from_blob { (ref $_[0] || $_[0])->new->tap(read_image_blob => $_[1]) }
 
-method [DestroyMagickWand => 'DESTROY'] => ['MagickWand'] => 'void';
+attach [DestroyMagickWand => 'DESTROY'] => ['MagickWand'] => 'void';
+
+=head1 PRIVATE METHODS
+
+=head2 _throw
+
+This method is called to throw an exception, its default behavior is to croak.
+You can create a subclass that overrides C<_throw>.
+
+=cut
+
+sub _throw {
+  my ($self, $xid, $xstr) = @_;
+  croak "ImageMagick Exception $xid: $xstr";
+}
 
 =head1 METHODS
 
@@ -126,7 +145,7 @@ Clears the wand of images (and properties?)
 
 =cut
 
-method [ClearMagickWand => 'clear'] => ['MagickWand'] => 'void';
+attach [ClearMagickWand => 'clear'] => ['MagickWand'] => 'void';
 
 =head2 clone
 
@@ -144,7 +163,7 @@ Returns current exception string and exception id, if any. (See L</Errors>)
 
 =cut
 
-method get_exception => ['MagickWand', 'ExceptionType*'] => 'copied_string' => sub {
+attach get_exception => ['MagickWand', 'ExceptionType*'] => 'copied_string' => sub {
   my ($sub, $wand) = @_;
   my $xstr = $sub->($wand, \(my $xid));
   $xid, $xstr;
@@ -158,7 +177,7 @@ Returns current exception id, if any. (See L</Errors>)
 
 =cut
 
-method get_exception_type => ['MagickWand'] => 'ExceptionType';
+attach get_exception_type => ['MagickWand'] => 'ExceptionType';
 
 =head2 clear_exception
 
@@ -166,7 +185,7 @@ Clears current exception.
 
 =cut
 
-method clear_exception    => ['MagickWand'] => 'MagickBooleanType';
+attach clear_exception    => ['MagickWand'] => 'MagickBooleanType';
 
 =head2 read_image
 
@@ -179,7 +198,7 @@ wand at the current index.
 
 =cut
 
-method read_image => ['MagickWand', 'string'] => 'MagickBooleanType', \&autodie;
+method read_image => ['MagickWand', 'string'] => 'MagickBooleanType';
 
 =head2 read_image_blob
 
@@ -191,7 +210,7 @@ The same as L</read_image>, but for data already in memory.
 
 # $wand->read_image_blob($blob); - sig differs thanks to wrapper, it adds size
 method read_image_blob => ['MagickWand', 'string', 'size_t'] => 'MagickBooleanType' => sub {
-  autodie(@_, length $_[-1]);
+  (shift)->(@_, length $_[-1]);
 };
 
 method [IsMagickWand => 'is_magick_wand'] => ['MagickWand'] => 'MagickBooleanType';
@@ -228,11 +247,11 @@ methods deals with the stack.
 
 =cut
 
-method next_image         => ['MagickWand'] => 'MagickBooleanType' => \&autodie;
-method previous_image     => ['MagickWand'] => 'MagickBooleanType' => \&autodie;
+method next_image         => ['MagickWand'] => 'MagickBooleanType';
+method previous_image     => ['MagickWand'] => 'MagickBooleanType';
 method get_number_images  => ['MagickWand'] => 'size_t';
 method get_iterator_index => ['MagickWand'] => 'ssize_t';
-method set_iterator_index => ['MagickWand', 'ssize_t'] => 'MagickBooleanType', \&autodie;
+method set_iterator_index => ['MagickWand', 'ssize_t'] => 'MagickBooleanType';
 method set_first_iterator => ['MagickWand'] => 'void';
 method set_last_iterator  => ['MagickWand'] => 'void';
 method reset_iterator     => ['MagickWand'] => 'void';
@@ -242,18 +261,18 @@ method get_image => ['MagickWand'] => 'MagickWand';
 
 sub get_image_at { $_[0]->tap(set_iterator_index => $_[1])->get_image }
 
-method write_image => ['MagickWand', 'string'] => 'MagickBooleanType', \&autodie;
+method write_image => ['MagickWand', 'string'] => 'MagickBooleanType';
 
 # my $blob = $wand->get_image_blob; - signature differs because of wrapping, no size ref req'd
 method get_image_blob  => ['MagickWand', 'size_t*'] => 'opaque' => \&copy_sized_buffer;
 method get_images_blob => ['MagickWand', 'size_t*'] => 'opaque' => \&copy_sized_buffer;
 
-method add_image => ['MagickWand', 'MagickWand'] => 'MagickBooleanType', \&autodie;
+method add_image => ['MagickWand', 'MagickWand'] => 'MagickBooleanType';
 
 sub add_image_from      { $_[0]->add_image($_[0]->new_from($_[1])) }
 sub add_image_from_blob { $_[0]->add_image($_[0]->new_from_blob($_[1])) }
 
-method add_noise_image => ['MagickWand', 'NoiseType', 'double'] => 'MagickBooleanType', \&autodie;
+method add_noise_image => ['MagickWand', 'NoiseType', 'double'] => 'MagickBooleanType';
 
 
 ## Property methods
@@ -264,7 +283,7 @@ method get_image_height => ['MagickWand'] => 'int';
 sub get_image_geometry { $_[0]->get_image_width, $_[0]->get_image_height }
 
 method get_image_format => ['MagickWand'] => 'copied_string';
-method set_image_format => ['MagickWand', 'string'] => 'MagickBooleanType', \&autodie;
+method set_image_format => ['MagickWand', 'string'] => 'MagickBooleanType';
 
 method get_options => ['MagickWand', 'string', 'size_t*'] => 'opaque' => sub {
   push @_, '' if $#_ == 1;  # default for 'string', avoids a segfault
@@ -305,31 +324,43 @@ method get_image_property => ['MagickWand', 'string'] => 'copied_string' => sub 
 
 method auto_orient_image => ['MagickWand'] => 'MagickBooleanType';
 
-method merge_image_layers => ['MagickWand', 'LayerMethod'] => 'MagickWand' => \&autodie;
+method merge_image_layers => ['MagickWand', 'LayerMethod'] => 'MagickWand';
 
 # TODO: command line and perlmagick have alternate syntax for specifying
 # geometry, i should try for that too
 
-method minify_image => ['MagickWand'] => 'MagickBooleanType' => \&autodie;
+method minify_image => ['MagickWand'] => 'MagickBooleanType';
 
-method resize_image   => ['MagickWand', 'size_t', 'size_t', 'FilterType'] => 'MagickBooleanType' => \&autodie;
+method resize_image   => ['MagickWand', 'size_t', 'size_t', 'FilterType'] => 'MagickBooleanType';
 
-method resample_image => ['MagickWand', 'size_t', 'size_t'] => 'MagickBooleanType' => \&autodie;
+method resample_image => ['MagickWand', 'size_t', 'size_t'] => 'MagickBooleanType';
 
-method sample_image   => ['MagickWand', 'size_t', 'size_t'] => 'MagickBooleanType' => \&autodie;
+method sample_image   => ['MagickWand', 'size_t', 'size_t'] => 'MagickBooleanType';
 
-method scale_image    => ['MagickWand', 'size_t', 'size_t'] => 'MagickBooleanType' => \&autodie;
+method scale_image    => ['MagickWand', 'size_t', 'size_t'] => 'MagickBooleanType';
 
-method thumbnail_image => ['MagickWand', 'size_t', 'size_t'] => 'MagickBooleanType' => \&autodie;
-
-
+method thumbnail_image => ['MagickWand', 'size_t', 'size_t'] => 'MagickBooleanType';
 
 
 ## Convenience functions, scrubbed from namespace
 
-sub method {
+# Shortcut for ffi attach
+sub attach {
   my ($name, @etc) = @_;
   $ffi->attach(ref $name ? $name : [demethodize($name) => $name], @etc);
+}
+
+# attach, but wrappped in autodie
+sub method {
+  my ($name, @sig) = @_;
+  my $wrapper = (ref $sig[-1] eq 'CODE') && pop @sig;
+
+  $wrapper =
+    $wrapper
+    ? sub { autodie($wrapper, @_) }
+    : \&autodie;
+
+  attach $name, @sig, $wrapper;
 }
 
 sub demethodize {
@@ -340,13 +371,14 @@ sub demethodize {
 sub autodie {
   my ($sub, $wand, @args) = @_;
   my $rv = $sub->($wand, @args);
-  return $rv if $rv;
 
   my ($xid, $xstr) = $wand->get_exception;
-  return $rv unless $xid;  # no exception, just a falsey result
+  if ($xid) {
+    $wand->clear_exception;
+    $wand->throw($xid, $xstr);
+  }
 
-  $wand->clear_exception;
-  die "ImageMagick Exception $xid: $xstr"; # TODO: Exception class?
+  return $rv;
 }
 
 1;
