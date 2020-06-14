@@ -32,7 +32,7 @@ $ffi->type('opaque' => $_) for qw/
   PixelWand
   /;
 
-$ffi->type('int' => $_) for qw/
+$ffi->type('enum' => $_) for qw/
   CompositeOperator
   ExceptionType
   GravityType
