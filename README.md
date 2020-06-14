@@ -6,7 +6,7 @@ Magick::Wand - ImageMagick's MagickWand, via FFI
 
 We're just getting started here!
 
-MagickWand by way of [FFI::Platypus](https://metacpan.org/pod/FFI::Platypus).
+MagickWand by way of [FFI::Platypus](https://metacpan.org/pod/FFI%3A%3APlatypus).
 
 Not on CPAN yet and the interface should not be considered stable.
 
@@ -15,8 +15,7 @@ Not on CPAN yet and the interface should not be considered stable.
     use Magick::Wand;
 
     for my $file (glob '*.jpg') {
-      my $w = Magick::Wand->new;
-      $w->read_image($file);
+      my $w = Magick::Wand->new_from($file);
       $w->auto_orient_image;
       $w->write_image($file);
     }
@@ -24,32 +23,23 @@ Not on CPAN yet and the interface should not be considered stable.
 # DESCRIPTION
 
 MagickWand is the library and API that ImageMagick recommends for use.
-`Magick::Wand` is an interface to MagickWand using [FFI::Platypus](https://metacpan.org/pod/FFI::Platypus).
+`Magick::Wand` is an interface to MagickWand using [FFI::Platypus](https://metacpan.org/pod/FFI%3A%3APlatypus).
 MagickWand is an object-like pattern so it maps nicely to one Perl object per
 instance of a Wand.
 
-Unlike PerlMagick (aka [Image::Magick](https://metacpan.org/pod/Image::Magick)), Magick::Wand does not itself need
+Unlike PerlMagick (aka [Image::Magick](https://metacpan.org/pod/Image%3A%3AMagick)), Magick::Wand does not itself need
 a C compiler, nor is it bundled into the ImageMagick source distribution and
 tied to specific versions of ImageMagick - all troublesome when working on
 Windows.
 
 # BEHAVIOR
 
-## Image Stack
-
-Each Wand holds one or more images, and has an "iterator", which is like the
-currently selected image in the stack.  Many operations work on the currently
-selected image, or insert new images at the current selection.  There is
-a group of methods dealing with this:
-
-["next\_image"](#next_image), ["previous\_image"](#previous_image), ["get\_number\_images"](#get_number_images),
-["get\_iterator\_index"](#get_iterator_index), ["set\_iterator\_index"](#set_iterator_index), ["set\_first\_iterator"](#set_first_iterator),
-["set\_last\_iterator"](#set_last_iterator), ["reset\_iterator"](#reset_iterator)
-
 ## Errors
 
-Magick::Wand throws exceptions on error.  MagickWand has the concept of
-a warning, and I still need to sort out how that is handled.
+MagickWand the library is based around explicitly checking for exceptions after
+an operation, while here we try to throw perl exceptions automatically.
+MagickWand has the concept of a warning, and right now that's treated equally
+with more severe errors.  See also: ["\_throw"](#_throw).
 
 ImageMagick error IDs are classified:
 
@@ -62,6 +52,18 @@ ImageMagick error IDs are classified:
     my $wand = Magick::Wand->new;
 
 Your basic constructor.
+
+## new\_from
+
+## new\_from\_blob
+
+    my $wand = Magick::Wand->new_from('file.jpg');
+
+Shortcuts for:
+
+    my $wand = Magick::Wand->new->tap(read_image => 'file.jpg');
+
+See also: ["read\_image"](#read_image), ["read\_image\_blob"](#read_image_blob)
 
 # METHODS
 
@@ -90,21 +92,6 @@ Clears the wand of images (and properties?)
 
 Returns a clone of the wand.
 
-## read\_image
-
-    $wand->read_image('path/to/file.png');
-    $wand->read_image('logo:');
-    $wand->read_image('http://foo.baz/image.jpg');
-
-Given a file path or URL, attempts to read the image and add its layers to the
-wand at the current index.
-
-## read\_image\_blob
-
-    $wand->read_image_blob($binary_string);
-
-The same as ["read\_image"](#read_image), but for data already in memory.
-
 ## get\_exception
 
     my ($xstr, $xid) = $wand->get_exception;
@@ -121,7 +108,50 @@ Returns current exception id, if any. (See ["Errors"](#errors))
 
 Clears current exception.
 
-...
+## read\_image
+
+    $wand->read_image('path/to/file.png');
+    $wand->read_image('logo:');
+    $wand->read_image('http://foo.baz/image.jpg');
+
+Given a file path or URL, attempts to read the image and add its layers to the
+wand at the current index.
+
+## read\_image\_blob
+
+    $wand->read_image_blob($binary_string);
+
+The same as ["read\_image"](#read_image), but for data already in memory.
+
+## Image Stack
+
+Each Wand holds one or more images, and has an "iterator", which is like the
+currently selected image in the stack.  Many operations work on the currently
+selected image, or insert new images at the current selection.  This group of
+methods deals with the stack.
+
+### next\_image
+
+### previous\_image
+
+### get\_number\_images
+
+### get\_iterator\_index
+
+### set\_iterator\_index
+
+### set\_first\_iterator
+
+### set\_last\_iterator
+
+### reset\_iterator
+
+# PRIVATE METHODS
+
+## \_throw
+
+This method is called to throw an exception, its default behavior is to croak.
+You can create a subclass that overrides `_throw`.
 
 # AUTHOR
 
@@ -129,7 +159,7 @@ Meredith Howard <mhoward@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Meredith Howard.
+This software is copyright (c) 2020 by Meredith Howard.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.
