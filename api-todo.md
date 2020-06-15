@@ -23,10 +23,10 @@ https://imagemagick.org/script/magick-wand.php
 - [X] MagickGetIteratorIndex
 - [X] MagickQueryConfigureOption
 - [X] MagickQueryConfigureOptions
-- [ ] MagickQueryFontMetrics
-- [ ] MagickQueryMultilineFontMetrics
-- [ ] MagickQueryFonts
-- [ ] MagickQueryFormats
+- [X] MagickQueryFontMetrics
+- [X] MagickQueryMultilineFontMetrics
+- [X] MagickQueryFonts
+- [X] MagickQueryFormats
 - [X] MagickRelinquishMemory
 - [X] MagickResetIterator
 - [X] MagickSetFirstIterator

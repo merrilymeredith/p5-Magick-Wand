@@ -63,7 +63,6 @@ use Carp qw/croak/;
 use subs qw/
   attach
   method
-  demethodize
 /;
 
 use namespace::clean;
@@ -207,6 +206,22 @@ method [IsMagickWand => 'is_magick_wand'] => ['MagickWand'] => 'MagickBooleanTyp
 # This "Image" would be a distinct class too.  Getting an image in the wand api
 # returns a wand.
 
+=head2 Query
+
+=cut
+
+
+method query_font_metrics => ['MagickWand', 'DrawingWand', 'string'] => 'double[13]';
+
+method query_multiline_font_metrics => ['MagickWand', 'DrawingWand', 'string'] => 'double[13]';
+
+# These are not really wand methods, but we'll make them act like they are so
+# they don't need to be tucked in ::API
+method query_configure_option  => ['string'] => 'copied_string' => sub { $_[0]->($_[2] // '') };
+method query_configure_options => ['string', 'size_t*'] => 'opaque' => \&query_fn_wrapper;
+method query_fonts             => ['string', 'size_t*'] => 'opaque' => \&query_fn_wrapper;
+method query_formats           => ['string', 'size_t*'] => 'opaque' => \&query_fn_wrapper;
+
 =head2 Image Stack
 
 Each Wand holds one or more images, and has an "iterator", which is like the
@@ -343,6 +358,7 @@ sub _throw {
 
 
 ## Convenience functions, these are namespace::cleaned
+no namespace::clean;
 
 # Shortcut for ffi attach
 sub attach {
@@ -387,6 +403,14 @@ sub demethodize {
   my $name = shift;
   return 'Magick' . join '', map { ucfirst lc } split '_', $name;
 }
+
+sub query_fn_wrapper {
+  splice(@_, 1, 1);  # Chop out $self, because this isn't really a method.
+  $_[1] //= '';      # Make sure pattern is defined
+  goto \&copy_sized_string_array;
+}
+
+use namespace::clean;
 
 1;
 __END__

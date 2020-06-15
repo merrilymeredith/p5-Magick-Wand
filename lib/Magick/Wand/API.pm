@@ -25,12 +25,9 @@ $ffi->lib(locate_libs());
 our $MAGICK_VERSION;  # < 0x700
 $ffi->function(GetMagickVersion => ['size_t*'] => 'string')->call(\$MAGICK_VERSION);
 
-$ffi->type('object(Magick::Wand)' => 'MagickWand');
-
-$ffi->type('opaque' => $_) for qw/
-  Image
-  PixelWand
-  /;
+$ffi->type('object(Magick::Wand)'          => 'MagickWand');
+$ffi->type('object(Magick::Wand::Pixel)'   => 'PixelWand');
+$ffi->type('object(Magick::Wand::Drawing)' => 'DrawingWand');
 
 $ffi->type('enum' => $_) for qw/
   CompositeOperator
@@ -61,12 +58,6 @@ $ffi->attach(@$_)
   [MagickWandGenesis        => [] => 'void'],
   [IsMagickWandInstantiated => [] => 'MagickBooleanType'],
   [MagickWandTerminus       => [] => 'void'],
-
-  [MagickQueryConfigureOption => ['string'] => 'copied_string' => sub { $_[0]->($_[1] // '') }],
-  [MagickQueryConfigureOptions => ['string', 'size_t*'] => 'opaque' => sub {
-    $_[1] //= '';
-    goto \&copy_sized_string_array;
-  }],
   );
 
 #TODO:
