@@ -357,10 +357,21 @@ sub method {
 
   attach $name, @sig, sub {
     my ($sub, $wand, @args) = @_;
-    my $rv =
-      $wrapper
-      ? $wrapper->($sub, $wand, @args)
-      : $sub->($wand, @args);
+    my $wantarray = wantarray;
+    my @rv;
+
+    if ($wantarray) {
+      @rv =
+          $wrapper
+        ? $wrapper->($sub, $wand, @args)
+        : $sub->($wand, @args);
+    }
+    else {
+      $rv[0] =
+          $wrapper
+        ? $wrapper->($sub, $wand, @args)
+        : $sub->($wand, @args);
+    }
 
     my ($xid, $xstr) = $wand->get_exception;
     if ($xid) {
@@ -368,7 +379,7 @@ sub method {
       $wand->_throw($xid, $xstr);
     }
 
-    return $rv;
+    return $wantarray ? @rv : $rv[0];
   };
 }
 
