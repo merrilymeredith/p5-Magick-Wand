@@ -64,7 +64,6 @@ use subs qw/
   attach
   method
   demethodize
-  autodie
 /;
 
 use namespace::clean;
@@ -356,30 +355,26 @@ sub method {
   my ($name, @sig) = @_;
   my $wrapper = (ref $sig[-1] eq 'CODE') && pop @sig;
 
-  $wrapper =
-    $wrapper
-    ? sub { autodie($wrapper, @_) }
-    : \&autodie;
+  attach $name, @sig, sub {
+    my ($sub, $wand, @args) = @_;
+    my $rv =
+      $wrapper
+      ? $wrapper->($sub, $wand, @args)
+      : $sub->($wand, @args);
 
-  attach $name, @sig, $wrapper;
+    my ($xid, $xstr) = $wand->get_exception;
+    if ($xid) {
+      $wand->clear_exception;
+      $wand->_throw($xid, $xstr);
+    }
+
+    return $rv;
+  };
 }
 
 sub demethodize {
   my $name = shift;
   return 'Magick' . join '', map { ucfirst lc } split '_', $name;
-}
-
-sub autodie {
-  my ($sub, $wand, @args) = @_;
-  my $rv = $sub->($wand, @args);
-
-  my ($xid, $xstr) = $wand->get_exception;
-  if ($xid) {
-    $wand->clear_exception;
-    $wand->throw($xid, $xstr);
-  }
-
-  return $rv;
 }
 
 1;

@@ -14,9 +14,12 @@ subtest 'basics' => sub {
 
   ok $w->is_magick_wand, 'looks reasonable to the library too';
 
-  ok dies {
+  ok my $ex = dies {
     $w->read_image("junk_path_$$.png")
   }, 'autodies work';
+
+  like $ex, qr/^ImageMagick Exception 435:/,
+    'correct exception';
 
   my $scratch = File::Temp->newdir;
 

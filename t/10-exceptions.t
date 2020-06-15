@@ -22,7 +22,7 @@ subtest 'override-throw' => sub {
       my $class = shift;
       bless $class->next::method(@_), (ref $class || $class);
     };
-    sub throw { return }
+    sub _throw { return }
   }
 
   my $w = My::Wand->new;
