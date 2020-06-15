@@ -21,8 +21,8 @@ https://imagemagick.org/script/magick-wand.php
 - [X] MagickGetException
 - [X] MagickGetExceptionType
 - [X] MagickGetIteratorIndex
-- [ ] MagickQueryConfigureOption
-- [ ] MagickQueryConfigureOptions
+- [X] MagickQueryConfigureOption
+- [X] MagickQueryConfigureOptions
 - [ ] MagickQueryFontMetrics
 - [ ] MagickQueryMultilineFontMetrics
 - [ ] MagickQueryFonts

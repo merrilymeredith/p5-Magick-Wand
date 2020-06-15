@@ -57,10 +57,16 @@ $ffi->custom_type('copied_string' => {
 
 $ffi->attach(@$_)
   for (
-  [MagickRelinquishMemory => ['opaque'] => 'opaque'],
+  [MagickRelinquishMemory   => ['opaque'] => 'opaque'],
   [MagickWandGenesis        => [] => 'void'],
   [IsMagickWandInstantiated => [] => 'MagickBooleanType'],
   [MagickWandTerminus       => [] => 'void'],
+
+  [MagickQueryConfigureOption => ['string'] => 'copied_string' => sub { $_[0]->($_[1] // '') }],
+  [MagickQueryConfigureOptions => ['string', 'size_t*'] => 'opaque' => sub {
+    $_[1] //= '';
+    goto \&copy_sized_string_array;
+  }],
   );
 
 #TODO:
